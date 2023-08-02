@@ -1,0 +1,39 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SetupExe.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="LogfilePath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">%SYSTEMROOT%\debug\deliveries_setupEXE_tasks\</Value>
+    </Setting>
+    <Setting Name="LogfileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">[ProductCode].log</Value>
+    </Setting>
+    <Setting Name="ExeLogfilePath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">%SYSTEMROOT%\debug\MSIPackages\</Value>
+    </Setting>
+    <Setting Name="ExeLogfileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">[ProductCode].log</Value>
+    </Setting>
+    <Setting Name="ExceptionLogfilePath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">%SYSTEMROOT%\debug\Deliveries_setupEXE\</Value>
+    </Setting>
+    <Setting Name="ExceptionlLogfileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">[Year]_[MM]_APPL_Exceptions.log</Value>
+    </Setting>
+    <Setting Name="GeneralLogfilePath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">%SYSTEMROOT%\debug\Deliveries_setupEXE\</Value>
+    </Setting>
+    <Setting Name="GeneralLogfileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">[Year]_[MM]_APPL_Starts.log</Value>
+    </Setting>
+    <Setting Name="ExeLogFileSplit" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">true</Value>
+    </Setting>
+    <Setting Name="LogfileSplit" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">true</Value>
+    </Setting>
+    <Setting Name="ActiveSetupLanguage" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">vbscript</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
