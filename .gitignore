@@ -5,6 +5,7 @@
 
 # my ignores
 _PACKAGES/
+MakeCodeLinks.bat
 
 # User-specific files
 *.rsuser
