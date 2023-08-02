@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Deliveries")]
 [assembly: AssemblyProduct("Setup.exe")]
-[assembly: AssemblyCopyright("Copyright Cluebiz 2008-2022")]
+[assembly: AssemblyCopyright("Copyright Cluebiz 2008-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
