@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Forms;
 using System.Threading;
 using Deliveries.SetupExe.Logic;
-using System.Reflection;
-using System.IO;
-using System.Diagnostics;
 
-/* git test change AGAIN */
 namespace SetupExe
 {
     static class Program
