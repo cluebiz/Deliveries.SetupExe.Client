@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliveries.SetupExe", "Deliveries.SetupExe\Deliveries.SetupExe.csproj", "{C8E67D87-73DA-4FBA-9B6E-4E5532EAFBDE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliveries.FastWrapper.ConvertEngine", "code\Deliveries.FastWrapper.ConvertEngine\Deliveries.FastWrapper.ConvertEngine.csproj", "{9A4D8CF2-F3C8-49CE-B948-A0FDFF6B1516}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliveries.SetupExe.Logic", "Deliveries.SetupExe.Logic\Deliveries.SetupExe.Logic.csproj", "{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliveries.SetupExe", "code\Deliveries.SetupExe\Deliveries.SetupExe.csproj", "{9BC7ACDD-D99F-4AE8-A4D3-10C25D736E30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliveries.FastWrapper.ConvertEngine", "Deliveries.FastWrapper.ConvertEngine\Deliveries.FastWrapper.ConvertEngine.csproj", "{9A4D8CF2-F3C8-49CE-B948-A0FDFF6B1516}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliveries.SetupExe.Logic", "code\Deliveries.SetupExe.Logic\Deliveries.SetupExe.Logic.csproj", "{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliveries.SetupExe.RunAsUserService", "Deliveries.SetupExe.RunAsUserService\Deliveries.SetupExe.RunAsUserService.csproj", "{8757C605-0DBF-45B7-978C-E1AAB1129D6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliveries.SetupExe.RunAsUserService", "code\Deliveries.SetupExe.RunAsUserService\Deliveries.SetupExe.RunAsUserService.csproj", "{8757C605-0DBF-45B7-978C-E1AAB1129D6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,18 +17,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C8E67D87-73DA-4FBA-9B6E-4E5532EAFBDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C8E67D87-73DA-4FBA-9B6E-4E5532EAFBDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C8E67D87-73DA-4FBA-9B6E-4E5532EAFBDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C8E67D87-73DA-4FBA-9B6E-4E5532EAFBDE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9A4D8CF2-F3C8-49CE-B948-A0FDFF6B1516}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9A4D8CF2-F3C8-49CE-B948-A0FDFF6B1516}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A4D8CF2-F3C8-49CE-B948-A0FDFF6B1516}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A4D8CF2-F3C8-49CE-B948-A0FDFF6B1516}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BC7ACDD-D99F-4AE8-A4D3-10C25D736E30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BC7ACDD-D99F-4AE8-A4D3-10C25D736E30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BC7ACDD-D99F-4AE8-A4D3-10C25D736E30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BC7ACDD-D99F-4AE8-A4D3-10C25D736E30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38ACDC51-8B55-4456-AFE2-1D355DF6FF9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8757C605-0DBF-45B7-978C-E1AAB1129D6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8757C605-0DBF-45B7-978C-E1AAB1129D6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8757C605-0DBF-45B7-978C-E1AAB1129D6E}.Release|Any CPU.ActiveCfg = Release|Any CPU

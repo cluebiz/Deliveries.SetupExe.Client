@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C8E67D87-73DA-4FBA-9B6E-4E5532EAFBDE}</ProjectGuid>
+    <ProjectGuid>{9BC7ACDD-D99F-4AE8-A4D3-10C25D736E30}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SetupExe</RootNamespace>
@@ -74,6 +74,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.IWshRuntimeLibrary">
+      <HintPath>..\..\LibrariesExternal\Interop.IWshRuntimeLibrary.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -86,15 +90,15 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Telerik.WinControls, Version=2018.2.515.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
-      <HintPath>..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.dll</HintPath>
+      <HintPath>..\..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Telerik.WinControls.Themes.TelerikMetro, Version=2018.2.515.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
-      <HintPath>..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.Themes.TelerikMetro.dll</HintPath>
+      <HintPath>..\..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.Themes.TelerikMetro.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Telerik.WinControls.UI, Version=2018.2.515.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
-      <HintPath>..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.UI.dll</HintPath>
+      <HintPath>..\..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.UI.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="UIAutomationClient" />
@@ -208,17 +212,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="IWshRuntimeLibrary">
-      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

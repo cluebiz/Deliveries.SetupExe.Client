@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C8E67D87-73DA-4FBA-9B6E-4E5532EAFBDE}</ProjectGuid>
+    <ProjectGuid>{9BC7ACDD-D99F-4AE8-A4D3-10C25D736E30}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SetupExe</RootNamespace>
@@ -161,7 +161,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\..\Deliveries.SetupExe.RunAsUserService\bin\Release\CluebizRunAsUserService.exe">
+    <EmbeddedResource Include="..\Deliveries.SetupExe.RunAsUserService\bin\Release\CluebizRunAsUserService.exe">
       <Link>Resources\CluebizRunAsUserService.exe</Link>
     </EmbeddedResource>
     <Content Include="app.ico" />
@@ -234,11 +234,11 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Deliveries.FastWrapper.ConvertEngine\Deliveries.FastWrapper.ConvertEngine.csproj">
+    <ProjectReference Include="..\Deliveries.FastWrapper.ConvertEngine\Deliveries.FastWrapper.ConvertEngine.csproj">
       <Project>{9a4d8cf2-f3c8-49ce-b948-a0fdff6b1516}</Project>
       <Name>Deliveries.FastWrapper.ConvertEngine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Deliveries.SetupExe.Logic\Deliveries.SetupExe.Logic.csproj">
+    <ProjectReference Include="..\Deliveries.SetupExe.Logic\Deliveries.SetupExe.Logic.csproj">
       <Project>{38acdc51-8b55-4456-afe2-1d355df6ff9e}</Project>
       <Name>Deliveries.SetupExe.Logic</Name>
     </ProjectReference>
