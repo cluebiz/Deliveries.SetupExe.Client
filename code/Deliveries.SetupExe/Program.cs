@@ -8,7 +8,7 @@ using System.Reflection;
 using System.IO;
 using System.Diagnostics;
 
-/* git test change */
+/* git test change AGAIN */
 namespace SetupExe
 {
     static class Program
