@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -1301,6 +1302,56 @@ namespace Deliveries.SetupExe.Logic
                     }
                     break;
 
+
+                case "setsecretvariable":
+                    {
+                        {
+
+                            string var = node.Attributes.GetNamedItem("var").Value.ToString();
+                            string value = node.Attributes.GetNamedItem("value").Value.ToString();
+
+                            bool lbDoneSomething = false;
+                            foreach (DataRow loVarRow in GlobalClass.VarTable.Rows)
+                            {
+                                if (loVarRow["name"].ToString().ToLower() == var.ToLower())
+                                {
+
+                                    if (value.StartsWith("[") && value.EndsWith("]"))
+                                    {
+                                        loVarRow["value"] = StringDecode(value.Substring(1, value.Length-2), GlobalClass.ProductCode);
+                                    }
+                                    else
+                                    {
+                                        loVarRow["value"] = value;
+                                    }
+                                    lbDoneSomething = true;
+
+                                    GlobalClass.logger.Info("::" + node.Name + " --> setvariable: updating '" + loVarRow["name"].ToString().ToLower() + "' to '" + value + @"'.", GlobalClass.SECTION);
+
+                                }
+                            }
+
+                            if (!lbDoneSomething)
+                            {
+                                DataRow loNewRow = GlobalClass.VarTable.NewRow();
+                                loNewRow["name"] = var;
+                                if (value.StartsWith("[") && value.EndsWith("]"))
+                                {
+                                    loNewRow["value"] = StringDecode(value.Substring(1, value.Length-2), GlobalClass.ProductCode);
+                                }
+                                else
+                                {
+                                    loNewRow["value"] = value;
+                                }
+                                GlobalClass.VarTable.Rows.Add(loNewRow);
+
+                                GlobalClass.logger.Info("::" + node.Name + " --> setvariable: adding '" + var + "' to '" + value + @"'.", GlobalClass.SECTION);
+                            }
+                            GlobalClass.VarTable.AcceptChanges();
+                        }
+                    }
+                    break;
+
                 case "getvariablefromregistry":
                     {
                         {
@@ -2130,6 +2181,23 @@ namespace Deliveries.SetupExe.Logic
             SetLabelEvent(this, null);
             GlobalClass.logger.Info("TASK (XMLnode:'" + XMLnode + "'): " + labelText + " (" + logDetails + ")", GlobalClass.SECTION);
         }
+
+
+        private static string StringEncode(string plainText, string key)
+        {
+            byte[] plainArr = Encoding.UTF8.GetBytes(plainText);
+            byte[] keyArr = Encoding.UTF8.GetBytes(key);
+            for (int nr = 0; nr<plainArr.Length; nr++) plainArr[nr] += keyArr[nr%keyArr.Length];
+            return Convert.ToBase64String(plainArr);
+        }
+        private static string StringDecode(string encodedText, string key)
+        {
+            byte[] encodedArr = Convert.FromBase64String(encodedText);
+            byte[] keyArr = Encoding.UTF8.GetBytes(key);
+            for (int nr = 0; nr<encodedArr.Length; nr++) encodedArr[nr] -= keyArr[nr%keyArr.Length];
+            return Encoding.UTF8.GetString(encodedArr, 0, encodedArr.Length);
+        }
+
 
     }
 

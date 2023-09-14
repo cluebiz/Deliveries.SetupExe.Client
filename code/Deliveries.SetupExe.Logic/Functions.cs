@@ -1526,6 +1526,9 @@ WindowFound:
             return lbReturn;
         }
 
+
+
+
         public bool ActivateWindow(IntPtr mainWindowHandle, string lsAction)
         {
             bool lbReturn = false;
@@ -3048,38 +3051,42 @@ WindowFound:
                             break;
                     }
 
-                    foreach (string regName in regKey.GetSubKeyNames())
+                    try
                     {
-                        bool validRegName = true;
-                        foreach (string regPart in patternname.Split(Convert.ToChar("*")))
+                        foreach (string regName in regKey.GetSubKeyNames())
                         {
-                            if (!regName.Contains(regPart))
+                            bool validRegName = true;
+                            foreach (string regPart in patternname.Split(Convert.ToChar("*")))
                             {
-                                validRegName = false;
-                            }
-                        }
-                        if (validRegName)
-                        {
-                            logger.Info("deleting path " + parentpath.Substring(hive.Length + 1) + @"\" + regName, GlobalClass.SECTION);
-                            try
-                            {
-                                switch (hive)
+                                if (!regName.Contains(regPart))
                                 {
-                                    case "HKLM":
-                                        logger.Info("DeleteSubKeyTree path " + parentpath.Substring(hive.Length + 1) + @"\" + regName, GlobalClass.SECTION);
-                                        Registry.LocalMachine.DeleteSubKeyTree(parentpath.Substring(hive.Length + 1) + @"\" + regName);
-                                        break;
-                                    case "HKCU":
-                                        Registry.CurrentUser.DeleteSubKeyTree(parentpath.Substring(hive.Length + 1) + @"\" + regName);
-                                        break;
-                                    case "HKCR":
-                                        Registry.ClassesRoot.DeleteSubKeyTree(parentpath.Substring(hive.Length + 1) + @"\" + regName);
-                                        break;
+                                    validRegName = false;
                                 }
                             }
-                            catch { }
+                            if (validRegName)
+                            {
+                                logger.Info("deleting path " + parentpath.Substring(hive.Length + 1) + @"\" + regName, GlobalClass.SECTION);
+                                try
+                                {
+                                    switch (hive)
+                                    {
+                                        case "HKLM":
+                                            logger.Info("DeleteSubKeyTree path " + parentpath.Substring(hive.Length + 1) + @"\" + regName, GlobalClass.SECTION);
+                                            Registry.LocalMachine.DeleteSubKeyTree(parentpath.Substring(hive.Length + 1) + @"\" + regName);
+                                            break;
+                                        case "HKCU":
+                                            Registry.CurrentUser.DeleteSubKeyTree(parentpath.Substring(hive.Length + 1) + @"\" + regName);
+                                            break;
+                                        case "HKCR":
+                                            Registry.ClassesRoot.DeleteSubKeyTree(parentpath.Substring(hive.Length + 1) + @"\" + regName);
+                                            break;
+                                    }
+                                }
+                                catch { }
+                            }
                         }
                     }
+                    catch { }
                 }
                 catch { }
 
