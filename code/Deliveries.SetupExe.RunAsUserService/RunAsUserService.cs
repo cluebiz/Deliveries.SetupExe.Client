@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
