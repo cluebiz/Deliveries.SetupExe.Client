@@ -7,7 +7,7 @@
     </xs:restriction>
   </xs:simpleType>
 
-
+ 
   <xs:complexType name="MetaData">
     <xs:all>
       <xs:element name="productname" type="notemptystring">
@@ -37,33 +37,33 @@
       </xs:element>
       <xs:element name="maininstallexe" type="notemptystring"  minOccurs="0" maxOccurs="1">
       </xs:element>
-      <xs:element name="originalsoftwareid" type="notemptystring"  minOccurs="0" maxOccurs="1">
+		<xs:element name="originalsoftwareid" type="notemptystring"  minOccurs="0" maxOccurs="1">
       </xs:element>
     </xs:all>
   </xs:complexType>
+  
+    <xs:complexType name="Configuration">
+	<xs:choice maxOccurs="unbounded">
+	<xs:group ref="configgroup" minOccurs="0" maxOccurs="1" />
+	</xs:choice>
+	</xs:complexType>
 
-  <xs:complexType name="Configuration">
-    <xs:choice maxOccurs="unbounded">
-      <xs:group ref="configgroup" minOccurs="0" maxOccurs="1" />
-    </xs:choice>
-  </xs:complexType>
-
-  <xs:group name="configgroup">
-    <xs:sequence>
+	<xs:group name="configgroup">
+	<xs:sequence>
       <xs:element name="config">
-        <xs:complexType>
+	    <xs:complexType>
           <xs:attribute name="name" use="required" type="notemptystring"/>
           <xs:attribute name="type" use="required" type="notemptystring"/>
-          <xs:attribute name="value" use="optional" type="xs:string" default="" />
-          <xs:attribute name="parameter" use="optional" type="xs:string" default="" />
+		  <xs:attribute name="value" use="optional" type="xs:string" default="" />
+		  <xs:attribute name="parameter" use="optional" type="xs:string" default="" />
         </xs:complexType>
       </xs:element>
-    </xs:sequence>
-  </xs:group>
-
+	  </xs:sequence>
+	</xs:group>
+  
 
   <xs:complexType name="DeployInfo">
-
+    
     <xs:sequence>
       <xs:element name="metadata" type="MetaData"/>
       <xs:element name="install" minOccurs="1" maxOccurs="1">
@@ -89,28 +89,28 @@
         </xs:complexType>
       </xs:element>
       <xs:element name="repair" maxOccurs="1">
-        <xs:complexType>
-          <xs:choice>
-            <xs:element name="tasks" minOccurs="1" maxOccurs="1">
-              <xs:complexType>
-                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
-              </xs:complexType>
-            </xs:element>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="initialize" minOccurs="0" maxOccurs="1" >
-        <xs:complexType>
-          <xs:choice>
-            <xs:element name="tasks" minOccurs="1" maxOccurs="1">
-              <xs:complexType>
-                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
-              </xs:complexType>
-            </xs:element>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="userinstall" minOccurs="0" maxOccurs="1" >
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="tasks" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+		<xs:element name="initialize" minOccurs="0" maxOccurs="1" >
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="tasks" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+		 <xs:element name="userinstall" minOccurs="0" maxOccurs="1" >
         <xs:complexType>
           <xs:choice>
             <xs:element name="tasks" minOccurs="1" maxOccurs="1">
@@ -133,61 +133,61 @@
         </xs:complexType>
       </xs:element>
       <xs:element name="userrepair" minOccurs="0" maxOccurs="1" >
-        <xs:complexType>
-          <xs:choice>
-            <xs:element name="tasks" minOccurs="1" maxOccurs="1">
-              <xs:complexType>
-                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
-              </xs:complexType>
-            </xs:element>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="userinitialize" minOccurs="0" maxOccurs="1" >
-        <xs:complexType>
-          <xs:choice>
-            <xs:element name="tasks" minOccurs="1" maxOccurs="1">
-              <xs:complexType>
-                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
-              </xs:complexType>
-            </xs:element>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="userrun" minOccurs="0" maxOccurs="1" >
-        <xs:complexType>
-          <xs:choice>
-            <xs:element name="tasks" minOccurs="1" maxOccurs="1">
-              <xs:complexType>
-                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
-              </xs:complexType>
-            </xs:element>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="testing" minOccurs="0" maxOccurs="1" >
-        <xs:complexType>
-          <xs:choice>
-            <xs:element name="tasks" minOccurs="1" maxOccurs="1">
-              <xs:complexType>
-                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
-              </xs:complexType>
-            </xs:element>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="snapshot" minOccurs="0" maxOccurs="1" >
-        <xs:complexType>
-          <xs:choice>
-            <xs:element name="tasks" minOccurs="1" maxOccurs="1">
-              <xs:complexType>
-                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
-              </xs:complexType>
-            </xs:element>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="configuration" type="Configuration" minOccurs="0" maxOccurs="1" />
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="tasks" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>		
+		<xs:element name="userinitialize" minOccurs="0" maxOccurs="1" >
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="tasks" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+<xs:element name="userrun" minOccurs="0" maxOccurs="1" >
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="tasks" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+		<xs:element name="testing" minOccurs="0" maxOccurs="1" >
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="tasks" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+		<xs:element name="snapshot" minOccurs="0" maxOccurs="1" >
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="tasks" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                  <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>		
+		<xs:element name="configuration" type="Configuration" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>
 
@@ -265,7 +265,7 @@
           <xs:attribute name="name" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
-      <xs:element name="killprocessbypath">
+	  <xs:element name="killprocessbypath">
         <xs:complexType>
           <xs:attribute name="path" use="required" type="notemptystring"/>
         </xs:complexType>
@@ -361,12 +361,12 @@
         </xs:complexType>
       </xs:element>
       <xs:element name="getvariablefromregistry">
-        <xs:complexType>
+        <xs:complexType>          
           <xs:attribute name="var" type="notemptystring"/>
           <xs:attribute name="path" type="notemptystring" use="required"/>
           <xs:attribute name="name" type="xs:string" default="" />
-        </xs:complexType>
-      </xs:element>
+        </xs:complexType> 
+      </xs:element>	  
       <xs:element name="checkregistry">
         <xs:complexType>
           <xs:choice maxOccurs="2" minOccurs="0">
@@ -388,7 +388,7 @@
           <xs:attribute name="path" type="notemptystring" use="required"/>
           <xs:attribute name="name" type="notemptystring"/>
           <xs:attribute name="value" type="notemptystring"/>
-        </xs:complexType>
+        </xs:complexType> 
       </xs:element>
       <xs:element name="checkarchitecture">
         <xs:complexType>
@@ -404,7 +404,7 @@
               </xs:complexType>
             </xs:element>
           </xs:choice>
-        </xs:complexType>
+        </xs:complexType> 
       </xs:element>
       <xs:element name="checkserver">
         <xs:complexType>
@@ -491,7 +491,7 @@
           </xs:attribute>
         </xs:complexType>
       </xs:element>
-      <xs:element name="executenowait">
+	    <xs:element name="executenowait">
         <xs:complexType>
           <xs:choice maxOccurs="unbounded" minOccurs="0">
             <xs:element name="parameters" maxOccurs="unbounded">
@@ -531,6 +531,12 @@
           <xs:attribute name="name" use="optional" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
+	  <xs:element name="removeregpath">
+        <xs:complexType>
+          <xs:attribute name="path" use="required" type="notemptystring"/>
+          <xs:attribute name="name" use="optional" type="notemptystring"/>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="addregkey">
         <xs:complexType>
           <xs:attribute name="path" type="notemptystring" use="required"/>
@@ -554,53 +560,61 @@
           <xs:attribute name="path" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
-      <xs:element name="setvariable">
+	  	  <xs:element name="setvariable">
         <xs:complexType>
           <xs:attribute name="var" use="required" type="notemptystring"/>
-          <xs:attribute name="value" use="optional" type="xs:string" default="" />
+		  <xs:attribute name="value" use="optional" type="xs:string" default="" />
         </xs:complexType>
       </xs:element>
 
-      <xs:element name="addshortcut">
+	  	  <xs:element name="setsecretvariable">
         <xs:complexType>
-          <xs:attribute name="path" use="required" type="notemptystring"/>
-          <xs:attribute name="destination" use="required" type="notemptystring"/>
-          <xs:attribute name="workdir" use="optional" type="notemptystring" />
-          <xs:attribute name="iconpath" use="optional" type="notemptystring" />
-          <xs:attribute name="iconindex" use="optional" type="xs:nonNegativeInteger" />
-          <xs:attribute name="description" use="optional" type="notemptystring" />
-          <xs:attribute name="arguments" use="optional" type="notemptystring" />
+          <xs:attribute name="var" use="required" type="notemptystring"/>
+		  <xs:attribute name="value" use="optional" type="xs:string" default="" />
         </xs:complexType>
       </xs:element>
-      <xs:element name="addfont">
+
+	  <xs:element name="addshortcut">
+        <xs:complexType>
+          <xs:attribute name="path" use="required" type="notemptystring"/>
+		  <xs:attribute name="destination" use="required" type="notemptystring"/>
+		  <xs:attribute name="workdir" use="optional" type="notemptystring" />
+		  <xs:attribute name="iconpath" use="optional" type="notemptystring" />
+		  <xs:attribute name="iconindex" use="optional" type="xs:nonNegativeInteger" />
+		  <xs:attribute name="description" use="optional" type="notemptystring" />
+		  <xs:attribute name="arguments" use="optional" type="notemptystring" />
+        </xs:complexType>
+      </xs:element>
+	  <xs:element name="addfont">
         <xs:complexType>
           <xs:attribute name="path" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
-      <xs:element name="removefont">
+	  <xs:element name="removefont">
         <xs:complexType>
           <xs:attribute name="path" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
-      <xs:element name="addpath">
+	  <xs:element name="addpath">
         <xs:complexType>
           <xs:attribute name="value" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
-      <xs:element name="removepath">
+	  <xs:element name="removepath">
         <xs:complexType>
           <xs:attribute name="value" use="required" type="notemptystring"/>
         </xs:complexType>
-      </xs:element>
-      <xs:element name="moveshortcuts">
+      </xs:element>	  
+	  <xs:element name="moveshortcuts">
         <xs:complexType>
           <xs:attribute name="path" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
-      <xs:element name="removeshortcuts">
+	  <xs:element name="removeshortcuts">
         <xs:complexType>
           <xs:attribute name="path" use="required" type="notemptystring"/>
           <xs:attribute name="filename" use="optional" type="notemptystring"/>
+          <xs:attribute name="mode" use="optional" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
       <xs:element name="setreboot"/>
@@ -656,12 +670,12 @@
           <xs:attribute name="destination" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
-      <xs:element name="writeini">
+	    <xs:element name="writeini">
         <xs:complexType>
           <xs:attribute name="inifile" use="required" type="notemptystring"/>
           <xs:attribute name="section" use="required" type="notemptystring"/>
-          <xs:attribute name="key" use="required" type="notemptystring"/>
-          <xs:attribute name="value" use="required" type="notemptystring"/>
+		      <xs:attribute name="key" use="required" type="notemptystring"/>
+		      <xs:attribute name="value" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
       <xs:element name="addtext">
@@ -674,7 +688,7 @@
         <xs:complexType>
           <xs:attribute name="path" use="required" type="notemptystring"/>
           <xs:attribute name="value" use="required" type="notemptystring"/>
-          <xs:attribute name="aggressive" use="optional" type="xs:boolean"/>
+		  <xs:attribute name="aggressive" use="optional" type="xs:boolean"/>
         </xs:complexType>
       </xs:element>
       <xs:element name="replacetext">
@@ -694,97 +708,97 @@
         </xs:complexType>
       </xs:element>
 
-
-      <xs:element name="addfilepermission">
-        <xs:complexType>
-          <xs:attribute name="path" use="required" type="notemptystring" />
-          <xs:attribute name="permission" use="required" type="notemptystring" />
-          <xs:attribute name="account" use="required" type="notemptystring" />
-          <xs:attribute name="replace" use="optional" type="xs:boolean"/>
+	  
+	  <xs:element name="addfilepermission">
+	   <xs:complexType>
+		  <xs:attribute name="path" use="required" type="notemptystring" />
+		  <xs:attribute name="permission" use="required" type="notemptystring" />
+		  <xs:attribute name="account" use="required" type="notemptystring" />
+		  <xs:attribute name="replace" use="optional" type="xs:boolean"/>
           <xs:attribute name="inheritance" use="optional" type="xs:boolean"/>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="removefilepermission">
-        <xs:complexType>
-          <xs:attribute name="path" use="required" type="notemptystring" />
-          <xs:attribute name="permission" use="optional" type="notemptystring" />
-          <xs:attribute name="account" use="required" type="notemptystring" />
+	   </xs:complexType>
+	  </xs:element>
+	  <xs:element name="removefilepermission">
+	   <xs:complexType>
+		<xs:attribute name="path" use="required" type="notemptystring" />
+		<xs:attribute name="permission" use="optional" type="notemptystring" />
+		<xs:attribute name="account" use="required" type="notemptystring" />
+		<xs:attribute name="inheritance" use="optional" type="xs:boolean"/>
+	   </xs:complexType>
+	  </xs:element>
+	  <xs:element name="addregpermission">
+	   <xs:complexType>
+		  <xs:attribute name="path" use="required" type="notemptystring" />
+		  <xs:attribute name="permission" use="required" type="notemptystring" />
+		  <xs:attribute name="account" use="required" type="notemptystring" />
+		  <xs:attribute name="replace" use="optional" type="xs:boolean"/>
           <xs:attribute name="inheritance" use="optional" type="xs:boolean"/>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="addregpermission">
-        <xs:complexType>
-          <xs:attribute name="path" use="required" type="notemptystring" />
-          <xs:attribute name="permission" use="required" type="notemptystring" />
-          <xs:attribute name="account" use="required" type="notemptystring" />
-          <xs:attribute name="replace" use="optional" type="xs:boolean"/>
-          <xs:attribute name="inheritance" use="optional" type="xs:boolean"/>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="removeregpermission">
-        <xs:complexType>
-          <xs:attribute name="path" use="required" type="notemptystring" />
-          <xs:attribute name="permission" use="optional" type="notemptystring" />
-          <xs:attribute name="account" use="required" type="notemptystring" />
-          <xs:attribute name="inheritance" use="optional" type="xs:boolean"/>
-        </xs:complexType>
-      </xs:element>
+	   </xs:complexType>
+	  </xs:element>
+	  <xs:element name="removeregpermission">
+	   <xs:complexType>
+		<xs:attribute name="path" use="required" type="notemptystring" />
+		<xs:attribute name="permission" use="optional" type="notemptystring" />
+		<xs:attribute name="account" use="required" type="notemptystring" />
+		<xs:attribute name="inheritance" use="optional" type="xs:boolean"/>
+	   </xs:complexType>
+	  </xs:element>
 
-      <xs:element name="sendwindowcommand">
-        <xs:complexType>
-          <xs:attribute name="command" use="required" type="notemptystring" />
-          <xs:attribute name="ctrlprocess" use="required" type="notemptystring" />
-          <xs:attribute name="ctrlid" use="optional" type="notemptystring" />
-        </xs:complexType>
-      </xs:element>
+	  <xs:element name="sendwindowcommand">
+	   <xs:complexType>
+		<xs:attribute name="command" use="required" type="notemptystring" />
+		<xs:attribute name="ctrlprocess" use="required" type="notemptystring" />
+		<xs:attribute name="ctrlid" use="optional" type="notemptystring" />
+	   </xs:complexType>
+	  </xs:element>
+      
+	  <xs:element name="sendmousecommand">
+	   <xs:complexType>
+       <xs:attribute name="command" use="required">
+         <xs:simpleType>
+           <xs:restriction base="xs:string">
+             <xs:enumeration value="LeftClick"/>
+             <xs:enumeration value="LeftDoubleclick"/>
+             <xs:enumeration value="LeftDrag"/>
+             <xs:enumeration value="RightClick"/>
+             <xs:enumeration value="RightDoubleclick"/>
+             <xs:enumeration value="RightDrag"/>
+           </xs:restriction>
+         </xs:simpleType>
+       </xs:attribute>
+       <xs:attribute name="x" use="required" type="notemptystring" />
+       <xs:attribute name="y" use="required" type="notemptystring" />
+       <xs:attribute name="positiontype" use="required">
+         <xs:simpleType>
+           <xs:restriction base="xs:string">
+             <xs:enumeration value="screen"/>
+             <xs:enumeration value="window"/>
+             <xs:enumeration value="control"/>
+           </xs:restriction>
+         </xs:simpleType>
+       </xs:attribute>       
+       <xs:attribute name="xEnd" use="optional" type="notemptystring" />
+       <xs:attribute name="yEnd" use="optional" type="notemptystring" />
+       <xs:attribute name="ctrlprocess" use="optional" type="notemptystring" />
+  		 <xs:attribute name="ctrlid" use="optional" type="notemptystring" />
+       <xs:attribute name="showmove" use="optional" type="xs:boolean"/>
+     </xs:complexType>
+	  </xs:element>
+      
+	  <xs:element name="sendkeyboardcommand">
+	   <xs:complexType>
+		<xs:attribute name="value" use="optional" type="notemptystring" />
+    <xs:attribute name="keys" use="optional" type="notemptystring" />
+		<xs:attribute name="ctrlprocess" use="optional" type="notemptystring" />
+		<xs:attribute name="ctrlid" use="optional" type="notemptystring" />
+	   </xs:complexType>
+	  </xs:element>
 
-      <xs:element name="sendmousecommand">
-        <xs:complexType>
-          <xs:attribute name="command" use="required">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:enumeration value="LeftClick"/>
-                <xs:enumeration value="LeftDoubleclick"/>
-                <xs:enumeration value="LeftDrag"/>
-                <xs:enumeration value="RightClick"/>
-                <xs:enumeration value="RightDoubleclick"/>
-                <xs:enumeration value="RightDrag"/>
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="x" use="required" type="notemptystring" />
-          <xs:attribute name="y" use="required" type="notemptystring" />
-          <xs:attribute name="positiontype" use="required">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:enumeration value="screen"/>
-                <xs:enumeration value="window"/>
-                <xs:enumeration value="control"/>
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="xEnd" use="optional" type="notemptystring" />
-          <xs:attribute name="yEnd" use="optional" type="notemptystring" />
-          <xs:attribute name="ctrlprocess" use="optional" type="notemptystring" />
-          <xs:attribute name="ctrlid" use="optional" type="notemptystring" />
-          <xs:attribute name="showmove" use="optional" type="xs:boolean"/>
-        </xs:complexType>
-      </xs:element>
-
-      <xs:element name="sendkeyboardcommand">
-        <xs:complexType>
-          <xs:attribute name="value" use="optional" type="notemptystring" />
-          <xs:attribute name="keys" use="optional" type="notemptystring" />
-          <xs:attribute name="ctrlprocess" use="optional" type="notemptystring" />
-          <xs:attribute name="ctrlid" use="optional" type="notemptystring" />
-        </xs:complexType>
-      </xs:element>
-
-      <xs:element name="setresolution">
-        <xs:complexType>
-          <xs:attribute name="resolution" use="required" type="notemptystring" />
-        </xs:complexType>
-      </xs:element>
+    <xs:element name="setresolution">
+      <xs:complexType>
+        <xs:attribute name="resolution" use="required" type="notemptystring" />
+      </xs:complexType>
+    </xs:element>      
 
       <xs:element name="videoscreenshot" >
         <xs:complexType>
@@ -792,30 +806,31 @@
           <xs:attribute name="cause" use="optional" type="notemptystring" />
         </xs:complexType>
       </xs:element>
-
-      <xs:element name="removeexistingsoftware">
-        <xs:complexType>
-          <xs:attribute name="uninstalltype" use="required">
+      
+	  <xs:element name="removeexistingsoftware">
+	  <xs:complexType>
+		<xs:attribute name="uninstalltype" use="required">
             <xs:simpleType>
               <xs:restriction base="xs:string">
                 <xs:enumeration value="displayname"/>
                 <xs:enumeration value="productcode"/>
                 <xs:enumeration value="upgradecode"/>
+				<xs:enumeration value="machinekeyname"/>
               </xs:restriction>
             </xs:simpleType>
           </xs:attribute>
-          <xs:attribute name="value" use="required" type="notemptystring" />
-        </xs:complexType>
-      </xs:element>
-
+		<xs:attribute name="value" use="required" type="notemptystring" />
+	  </xs:complexType>
+	  </xs:element>
+	  
       <xs:element name="checkmemory">
         <xs:complexType>
           <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
           <xs:attribute name="memory" type="xs:positiveInteger"/>
         </xs:complexType>
-      </xs:element>
+      </xs:element>     
       <xs:element name="getoslanguage">
-        <xs:complexType>
+         <xs:complexType>
           <xs:choice maxOccurs="unbounded" minOccurs="0">
             <xs:element name="languagecodes" maxOccurs="unbounded">
               <xs:complexType>
@@ -834,12 +849,10 @@
       </xs:element>
     </xs:choice>
   </xs:group>
-
+  
   <xs:element name="deploy" type="DeployInfo">
     <xs:annotation>
-      <xs:appinfo>
-        <version>1.9.1</version>
-      </xs:appinfo>
+      <xs:appinfo><version>1.9.1</version></xs:appinfo>
     </xs:annotation>
   </xs:element>
 </xs:schema>

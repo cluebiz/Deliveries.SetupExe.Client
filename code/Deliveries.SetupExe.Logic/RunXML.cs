@@ -930,6 +930,7 @@ namespace Deliveries.SetupExe.Logic
                     string cmdline = "";
                     string parameter = "";
                     string parameters = "";
+                    string parameterssecure = "";
                     string cmdreturnvalue = "";
                     string wait = "true"; //default
                     string windowstyle = "normal"; //default
@@ -969,6 +970,7 @@ namespace Deliveries.SetupExe.Logic
                                 if (parameterchildnode.InnerXml.ToString() != "")
                                 {
                                     parameter = parameterchildnode.InnerText.ToString();
+                                    parameterssecure = parameterssecure + parameter + " ";
                                     myFunctions.ReplaceEnvVariables(ref parameter, GlobalClass.VarTable, GlobalClass.ParameterTable);
                                     parameters = parameters + parameter + " ";
                                 }
@@ -976,7 +978,7 @@ namespace Deliveries.SetupExe.Logic
                         }
                     }
                     parameters = parameters.Trim();
-                    SetLabel(node.Name, "Executing '" + cmdline + "'", "parameters: '" + parameters + "' / wait: '" + wait + "'");
+                    SetLabel(node.Name, "Executing '" + cmdline + "'", "parameters: '" + parameterssecure + "' / wait: '" + wait + "'");
                     cmdreturnvalue = myFunctions.ExecuteCMD(cmdline, parameters, ref errormsg, wait, windowstyle, GlobalClass.VarTable, GlobalClass.ParameterTable);
 
                     //1618 in case of "msiexec" --> wait a few seconds and try again
