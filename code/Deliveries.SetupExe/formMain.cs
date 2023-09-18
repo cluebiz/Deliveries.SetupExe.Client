@@ -1353,7 +1353,7 @@ namespace SetupExe
                     GlobalClass.UninstallAfter.Columns.Add("key");
                     GlobalClass.UninstallAfter.Columns.Add("architecture");
 
-                    if (!goodHash)
+                    if (goodHash)
                     {
 
                         RunXML loRunXML = new RunXML();
@@ -1599,7 +1599,7 @@ namespace SetupExe
                     }
                     catch { }
 
-                    if (!goodHash)
+                    if (goodHash)
                     {
                         switch (installtype)
                         {
