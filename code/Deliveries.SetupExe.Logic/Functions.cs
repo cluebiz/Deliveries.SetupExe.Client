@@ -3432,7 +3432,7 @@ WindowFound:
         }
 
 
-        public int AppInstaller(string action, string name, string filename)
+        public int AppInstaller(string action, string name, string filename, DataTable loVarTable, DataTable loParameterTable)
         {
 
             Process currentProcess = Process.GetCurrentProcess();
@@ -3478,6 +3478,9 @@ WindowFound:
                                     }
                                 }
                                 catch { }
+
+                                string errormessage = "";
+
                                 logger.Info("Looking for prerequisites in " + msixfolder, GlobalClass.SECTION);
                                 foreach (string prefilename in System.IO.Directory.GetFiles(msixfolder,"*.*",SearchOption.TopDirectoryOnly))
                                 {
@@ -3486,9 +3489,12 @@ WindowFound:
                                         if (System.IO.Path.GetFileName(prefilename) != System.IO.Path.GetFileName(filename))
                                         {
                                             string prefullfilename = prefilename;
-                                            commandline = @"Add-AppxPackage -Path '" + prefullfilename + @"'";
+                                            //commandline = @"Add-AppxPackage -Path '" + prefullfilename + @"'";
+//                                            commandline = @"/online /add-ProvisionedAppxPackage /packagepath:""" + prefullfilename + @""" /skip-license";
+                                            commandline = @"/Online /Add-ProvisionedAppxPackage /PackagePath:""" + prefullfilename + @""" /SkipLicense";
                                             logger.Info("Installing prerequisites: " + commandline, GlobalClass.SECTION);
-                                            logger.Info(PSExecute(commandline), GlobalClass.SECTION);
+                                            //logger.Info(PSExecute(commandline), GlobalClass.SECTION);
+                                            ExecuteCMD("DISM.EXE", commandline, ref errormessage, "true", "hidden", loVarTable, loParameterTable);
                                         }
                                     }
                                 }
@@ -3501,9 +3507,12 @@ WindowFound:
                                 {
                                     fullfilename = filename;
                                 }
-                                commandline = @"Add-AppxPackage -Path '" + fullfilename + @"'";
+                                //commandline = @"Add-AppxPackage -Path '" + fullfilename + @"'";
+                                //commandline = @"/online /add-ProvisionedAppxPackage /packagepath:""" + fullfilename + @""" /skip-license";
+                                commandline = @"/Online /Add-ProvisionedAppxPackage /PackagePath:""" + fullfilename + @""" /SkipLicense";
+
                                 logger.Info("Running " + commandline, GlobalClass.SECTION);
-                                logger.Info(PSExecute(commandline), GlobalClass.SECTION);
+                                ExecuteCMD("DISM.EXE", commandline, ref errormessage, "true", "hidden", loVarTable, loParameterTable);
                                 break;
                             default:
                                 logger.Error("Unknown file type for " + filename, GlobalClass.SECTION);

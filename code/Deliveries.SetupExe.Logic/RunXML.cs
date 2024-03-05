@@ -919,7 +919,7 @@ namespace Deliveries.SetupExe.Logic
                         appinstallerfilename = node.Attributes.GetNamedItem("filename").Value.ToString();
                     }
                     catch { }
-                    returnvalue = myFunctions.AppInstaller(appinstalleraction, appinstallername, appinstallerfilename);
+                    returnvalue = myFunctions.AppInstaller(appinstalleraction, appinstallername, appinstallerfilename, GlobalClass.VarTable, GlobalClass.ParameterTable);
                     GlobalClass.logger.Info("::" + node.Name + " --> returnvalue: " + returnvalue, GlobalClass.SECTION);
                     break;
 
@@ -2180,7 +2180,7 @@ namespace Deliveries.SetupExe.Logic
         {
             //set_labeltext(labelText);
             ActualLabel = labelText;
-            SetLabelEvent(this, null);
+            //GAX SetLabelEvent(this, null);
             GlobalClass.logger.Info("TASK (XMLnode:'" + XMLnode + "'): " + labelText + " (" + logDetails + ")", GlobalClass.SECTION);
         }
 

@@ -1,0 +1,64 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\CluebizSolutionsGIT\\TracesAndDeliveries\\Deliveries.SetupExe.Logic\\Deliveries.SetupExe.Logic.csproj": {}
+  },
+  "projects": {
+    "D:\\CluebizSolutionsGIT\\TracesAndDeliveries\\Deliveries.SetupExe.Logic\\Deliveries.SetupExe.Logic.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\CluebizSolutionsGIT\\TracesAndDeliveries\\Deliveries.SetupExe.Logic\\Deliveries.SetupExe.Logic.csproj",
+        "projectName": "Deliveries.SetupExe.Logic",
+        "projectPath": "D:\\CluebizSolutionsGIT\\TracesAndDeliveries\\Deliveries.SetupExe.Logic\\Deliveries.SetupExe.Logic.csproj",
+        "packagesPath": "D:\\CluebizSolutionsGIT\\_PACKAGES",
+        "outputPath": "D:\\CluebizSolutionsGIT\\TracesAndDeliveries\\Deliveries.SetupExe.Logic\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        ],
+        "configFilePaths": [
+          "D:\\CluebizSolutionsGIT\\NuGet.Config",
+          "C:\\Users\\adrian\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net452"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net452": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net452": {
+          "dependencies": {
+            "DotNetZip": {
+              "target": "Package",
+              "version": "[1.16.0, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

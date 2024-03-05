@@ -97,8 +97,10 @@ namespace Deliveries.SetupExe.Logic
                 
                 FileInfo fileinfo = new FileInfo(logFile);
                 FileSecurity filesecurity = fileinfo.GetAccessControl();
+                //FileSecurity filesecurity = FileSystemAclExtensions.GetAccessControl(fileinfo);
                 filesecurity.AddAccessRule(new FileSystemAccessRule(sid,FileSystemRights.FullControl,AccessControlType.Allow));
                 fileinfo.SetAccessControl(filesecurity);
+                //FileSystemAclExtensions.SetAccessControl(fileinfo, filesecurity);
             }
             catch (Exception)
             {

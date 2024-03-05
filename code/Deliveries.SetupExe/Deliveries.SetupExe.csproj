@@ -91,15 +91,15 @@
     <Reference Include="System.Xml" />
     <Reference Include="Telerik.WinControls, Version=2018.2.515.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
       <HintPath>..\..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="Telerik.WinControls.Themes.TelerikMetro, Version=2018.2.515.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
       <HintPath>..\..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.Themes.TelerikMetro.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Telerik.WinControls.UI, Version=2018.2.515.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
+    <Reference Include="Telerik.WinControls.UI">
       <HintPath>..\..\LibrariesExternal\RCWF\2018.2.515.40\Telerik.WinControls.UI.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="UIAutomationClient" />
     <Reference Include="UIAutomationTypes" />
