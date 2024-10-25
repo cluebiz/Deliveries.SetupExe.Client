@@ -14325,7 +14325,32 @@ namespace Deliveries.FastWrapper.Logic
             loStringBuilder.AppendLine(@"# Version:      " + lsVersion);
             loStringBuilder.AppendLine(@"# Date:         " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             loStringBuilder.AppendLine(@"");
-
+            loStringBuilder.AppendLine(@"$oslanguage = ""1033""");
+            loStringBuilder.AppendLine(@"$prefereduilanguage = ""en-US""");
+            loStringBuilder.AppendLine(@"try {");
+            loStringBuilder.AppendLine(@"$prefereduilanguage = get-systempreferreduilanguage");
+            loStringBuilder.AppendLine(@"} catch { }");
+            loStringBuilder.AppendLine(@"$prefereduilanguage = $prefereduilanguage.ToLower()");
+            loStringBuilder.AppendLine(@"if($prefereduilanguage.StartsWith(""en-""))");
+            loStringBuilder.AppendLine(@"{");
+            loStringBuilder.AppendLine(@"$oslanguage = ""1033""");
+            loStringBuilder.AppendLine(@"}");
+            loStringBuilder.AppendLine(@"if($prefereduilanguage.StartsWith(""de-""))");
+            loStringBuilder.AppendLine(@"{");
+            loStringBuilder.AppendLine(@"$oslanguage = ""1031""");
+            loStringBuilder.AppendLine(@"}");
+            loStringBuilder.AppendLine(@"if($prefereduilanguage.StartsWith(""fr-""))");
+            loStringBuilder.AppendLine(@"{");
+            loStringBuilder.AppendLine(@"$oslanguage = ""1036""");
+            loStringBuilder.AppendLine(@"}");
+            loStringBuilder.AppendLine(@"if($prefereduilanguage.StartsWith(""es-""))");
+            loStringBuilder.AppendLine(@"{");
+            loStringBuilder.AppendLine(@"$oslanguage = ""1034""");
+            loStringBuilder.AppendLine(@"}");
+            loStringBuilder.AppendLine(@"if($prefereduilanguage.StartsWith(""it-""))");
+            loStringBuilder.AppendLine(@"{");
+            loStringBuilder.AppendLine(@"$oslanguage = ""1040""");
+            loStringBuilder.AppendLine(@"}");
 
             foreach (DataRow loRow in loTable.Rows)
             {
@@ -14529,9 +14554,15 @@ namespace Deliveries.FastWrapper.Logic
                             loStringBuilder.AppendLine(@"Set-ItemProperty -Path ""$RegKey"" -Name """ + lsName + @""" -Type " + lsType + @" -Value """ + lsValue + @"""");
                             loStringBuilder.AppendLine(@"}");
                             loStringBuilder.AppendLine(@"catch { }");
-
                         }
                         break;
+
+                    case "checklanguagecode":
+                        loStringBuilder.AppendLine(@"if ($oslanguage -eq '" + loRow["command"].ToString() + "')");
+                        loStringBuilder.AppendLine(@"{");
+                        break;
+
+
                     case "checkfile":
                         loStringBuilder.AppendLine("$testpath=[System.Environment]::ExpandEnvironmentVariables('" + loRow["path"].ToString() + "')");
                         loStringBuilder.AppendLine(@"if (Test-Path $testpath)");
@@ -14553,6 +14584,7 @@ namespace Deliveries.FastWrapper.Logic
                                 break;
                         }
                         break;
+
                     case "endcheck":
                         loStringBuilder.AppendLine(lsInherit + @"}");
                         break;
