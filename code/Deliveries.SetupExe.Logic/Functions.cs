@@ -396,6 +396,9 @@ namespace Deliveries.SetupExe.Logic
                 }
                 catch { }
             }
+
+            logger.Info("ExpandFolder " + source, GlobalClass.SECTION);
+
             if (System.IO.File.Exists(source))
             {
                 try
@@ -410,7 +413,9 @@ namespace Deliveries.SetupExe.Logic
                         loZip.ExtractAll(dest, Ionic.Zip.ExtractExistingFileAction.OverwriteSilently);
                     }
                 }
-                catch { }
+                catch (Exception ex) {
+                    logger.Warn("ExpandFolder error " + ex.Message, GlobalClass.SECTION);
+                }
             }
 
             return lbReturn;
@@ -586,10 +591,68 @@ namespace Deliveries.SetupExe.Logic
             {
                 try
                 {
-                    string path = Regex.Replace(Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Machine), Environment.ExpandEnvironmentVariables(lsValue), "", RegexOptions.IgnoreCase);
-                    path = path.Replace(";;", ";");
+                    string actualPath = "";
+                    string removePath = "";
+
+
+                    try
+                    {
+                        actualPath = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Machine).ToString();
+                    }
+                    catch { }
+
+                    //if(actualPath=="")
+                    //{
+                    //    var allMachine = Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Machine);
+                    //    foreach (var key in allMachine.Keys)
+                    //    {
+                    //        Console.WriteLine(key + " = " + allMachine[key]); 
+                    //        logger.Info("key " + key + " = " + allMachine[key], GlobalClass.SECTION);
+
+                    //    }
+                    //}
+
+                    try
+                    {
+                        removePath = Environment.ExpandEnvironmentVariables(lsValue);
+                    }
+                    catch { }
+                    logger.Info("removing [" + removePath + "] from [" + actualPath + "]", GlobalClass.SECTION);
+
+                    string path = "";
+                    try
+                    {
+                        path = actualPath;
+                    }
+                    catch { }
+                    try
+                    {
+                        path = Regex.Replace(path, removePath, "", RegexOptions.IgnoreCase);
+                    }
+                    catch { }
+                    try
+                    {
+                        path = path.Replace(removePath, "");
+                    }
+                    catch { }
+                    try
+                    {
+                        path = ReplaceInsensitive(path, removePath, "");
+                    }
+                    catch { }
+                    try
+                    {
+                        path = path.Replace(";;", ";");
+                    }
+                    catch { }
                     path = path.Trim();
-                    Environment.SetEnvironmentVariable("Path", path, EnvironmentVariableTarget.Machine);
+
+                    logger.Info("now path is [" + path + "]", GlobalClass.SECTION);
+
+                    if (path.Length > 0)
+                    {
+                        Environment.SetEnvironmentVariable("Path", path, EnvironmentVariableTarget.Machine);
+                    }
                     result = 1;
                 }
                 catch { }
@@ -618,7 +681,20 @@ namespace Deliveries.SetupExe.Logic
             return string.Empty;
         }
 
-        public bool RemoveShortcuts(string lsPath, string lsFileName, string lsMode, string[] lsBeforeStartMenu, string [] lsBeforeDesktop)
+
+        string ReplaceInsensitive(string input, string search, string replacement)
+        {
+            int pos = 0;
+            while ((pos = input.IndexOf(search, pos, StringComparison.OrdinalIgnoreCase)) >= 0)
+            {
+                input = input.Remove(pos, search.Length)
+                             .Insert(pos, replacement);
+                pos += replacement.Length;
+            }
+            return input;
+        }
+
+        public bool RemoveShortcuts(string lsPath, string lsFileName, string lsMode, string[] lsBeforeStartMenu, string [] lsBeforeDesktop, string[] lsUserBeforeStartMenu, string[] lsUserBeforeDesktop)
         {
             if (lsPath.EndsWith(@"\"))
             {
@@ -633,7 +709,7 @@ namespace Deliveries.SetupExe.Logic
             {
                 case "createdduringinstall":
 
-                    if (lsPath.ToLower().Contains("public"))
+                    if (lsPath.ToLower().Contains(@"%public%\desktop"))
                     {
                         try {
                             string[] filesafter;
@@ -661,10 +737,98 @@ namespace Deliveries.SetupExe.Logic
                         }
                         catch { }
                     }
-                
+                    if (lsPath.ToLower().Contains(@"%userprofile%\desktop"))
+                    {
+                        try
+                        {
+                            string[] filesafter;
+                            filesafter = Directory.GetFiles(Environment.ExpandEnvironmentVariables(@"%UserProfile%\Desktop"), "*.*", SearchOption.AllDirectories);
+                            foreach (string lsFile in filesafter)
+                            {
+                                bool lbFoundInBefore = false;
+                                foreach (string lsBeforeFile in lsUserBeforeDesktop)
+                                {
+                                    if (lsBeforeFile == lsFile)
+                                    {
+                                        lbFoundInBefore = true;
+                                    }
+                                }
+                                if (!lbFoundInBefore)
+                                {
+                                    try
+                                    {
+                                        System.IO.File.Delete(lsFile);
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                        }
+                        catch { }
+                    }
+
+                    if (lsPath.ToLower().Contains(@"%programdata%\microsoft\windows\start menu"))
+                    {
+                        try
+                        {
+                            string[] filesafter;
+                            filesafter = Directory.GetFiles(Environment.ExpandEnvironmentVariables(@"%ProgramData%\Microsoft\Windows\Start Menu"), "*.*", SearchOption.AllDirectories);
+                            foreach (string lsFile in filesafter)
+                            {
+                                bool lbFoundInBefore = false;
+                                foreach (string lsBeforeFile in lsBeforeStartMenu)
+                                {
+                                    if (lsBeforeFile == lsFile)
+                                    {
+                                        lbFoundInBefore = true;
+                                    }
+                                }
+                                if (!lbFoundInBefore)
+                                {
+                                    try
+                                    {
+                                        System.IO.File.Delete(lsFile);
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                        }
+                        catch { }
+                    }
+                    if (lsPath.ToLower().Contains(@"%appdata%\microsoft\windows\start menu"))
+                    {
+                        try
+                        {
+                            string[] filesafter;
+                            filesafter = Directory.GetFiles(Environment.ExpandEnvironmentVariables(@"%APPDATA%\Microsoft\Windows\Start Menu"), "*.*", SearchOption.AllDirectories);
+                            foreach (string lsFile in filesafter)
+                            {
+                                bool lbFoundInBefore = false;
+                                foreach (string lsBeforeFile in lsUserBeforeStartMenu)
+                                {
+                                    if (lsBeforeFile == lsFile)
+                                    {
+                                        lbFoundInBefore = true;
+                                    }
+                                }
+                                if (!lbFoundInBefore)
+                                {
+                                    try
+                                    {
+                                        System.IO.File.Delete(lsFile);
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                        }
+                        catch { }
+                    }
 
 
-            break;
+
+                    break;
                 case "brokentarget":
                 default:
 
@@ -962,10 +1126,11 @@ namespace Deliveries.SetupExe.Logic
             return true;
         }
 
-        public bool RemoveExistingSoftware(string lsUninstallType, string lsValue)
+        public string CheckExistingSoftware(string lsUninstallType, string lsValue)
         {
-            logger.Info("removeexistingproduct " + lsUninstallType + " " + lsValue, GlobalClass.SECTION);
+            logger.Info("CheckExistingSoftware looking for  " + lsUninstallType + " : " + lsValue, GlobalClass.SECTION);
 
+            string lsReturn = "";
             switch (lsUninstallType.ToLower())
             {
                 case "productcode":
@@ -991,12 +1156,14 @@ namespace Deliveries.SetupExe.Logic
 
                                         foreach (string lsItem in lsGenerateUninstallKey.Split(Convert.ToChar("|")))
                                         {
-                                            NowUninstallSoftware(lsItem);
+                                            lsReturn += lsItem + "|";
+                                            //NowUninstallSoftware(lsItem);
                                         }
                                     }
                                     else
                                     {
-                                        NowUninstallSoftware(lsSubKey);
+                                        lsReturn += lsSubKey + "|";
+                                        //NowUninstallSoftware(lsSubKey);
                                     }
                                 }
                             }
@@ -1021,24 +1188,42 @@ namespace Deliveries.SetupExe.Logic
                                     {
                                         foreach (string lsItem in lsGenerateUninstallKey.Split(Convert.ToChar("|")))
                                         {
-                                            NowUninstallSoftware(lsItem);
+                                            lsReturn += "|";
+                                            //NowUninstallSoftware(lsItem);
                                         }
                                     }
                                     else
                                     {
-                                        NowUninstallSoftware(lsSubKey);
+                                        lsReturn += "|";
+                                        //NowUninstallSoftware(lsSubKey);
                                     }
                                 }
                             }
                         }
                         catch { }
                     }
-                    break;                
+                    break;
                 case "machinekeyname":
                 case "displayname":
+                case "winget":
                     {
+                        string lsWingetManufacturer = "";
+                        string lsWingetProduct = "";
+                        try
+                        {
+                            lsWingetManufacturer = lsValue.Split(Convert.ToChar("|"))[0].ToLower().Replace(" ","");
+                        }
+                        catch { }
+                        try
+                        {
+                            lsWingetProduct = lsValue.Split(Convert.ToChar("|"))[1].ToLower().Replace(" ","");
+                        }
+                        catch { }
+
+                        logger.Info("CheckExistingSoftware Winget  " + lsWingetManufacturer + " : " + lsWingetProduct, GlobalClass.SECTION);
+
                         string searchforname = "DisplayName";
-                        if(lsUninstallType.ToLower()=="machinekeyname")
+                        if (lsUninstallType.ToLower()=="machinekeyname")
                         {
                             searchforname="MachineKeyName";
                         }
@@ -1048,6 +1233,13 @@ namespace Deliveries.SetupExe.Logic
                             RegistryKey regKey = Registry.LocalMachine.OpenSubKey(path);
                             foreach (string lsSubKey in regKey.GetSubKeyNames())
                             {
+                                string lsPublisher = "";
+                                try
+                                {
+                                    RegistryKey subKey = Registry.LocalMachine.OpenSubKey(path + @"\" + lsSubKey);
+                                    lsPublisher = subKey.GetValue("Publisher").ToString();
+                                }
+                                catch { }
                                 try
                                 {
                                     string lsDisplayName = "";
@@ -1055,10 +1247,30 @@ namespace Deliveries.SetupExe.Logic
                                     lsDisplayName = subKey.GetValue(searchforname).ToString();
                                     if (lsDisplayName != "")
                                     {
-                                        lsValue = lsValue.Replace("*", "");
-                                        if (lsDisplayName.ToLower().Contains(lsValue.ToLower()))
+
+                                        logger.Info("CheckExistingSoftware checking 64 " + lsDisplayName + " : " + lsPublisher, GlobalClass.SECTION);
+
+
+                                        if (lsUninstallType=="winget")
                                         {
-                                            NowUninstallSoftware(lsSubKey);
+                                            if(lsDisplayName.ToLower().Replace(" ","").Contains(lsWingetProduct))
+                                            {
+                                                if(lsPublisher.ToLower().Replace(" ","").Contains(lsWingetManufacturer))
+                                                {
+                                                    logger.Info("CheckExistingSoftware found 64 " + lsSubKey, GlobalClass.SECTION);
+
+                                                    lsReturn += lsSubKey + "|";
+                                                }
+                                            }    
+                                        }
+                                        else
+                                        {
+                                            lsValue = lsValue.Replace("*", "");
+                                            if (lsDisplayName.ToLower().Contains(lsValue.ToLower()))
+                                            {
+                                                lsReturn += lsSubKey + "|";
+                                                //NowUninstallSoftware(lsSubKey);
+                                            }
                                         }
                                     }
                                 }
@@ -1072,6 +1284,13 @@ namespace Deliveries.SetupExe.Logic
                             RegistryKey regKey = Registry.LocalMachine.OpenSubKey(path);
                             foreach (string lsSubKey in regKey.GetSubKeyNames())
                             {
+                                string lsPublisher = "";
+                                try
+                                {
+                                    RegistryKey subKey = Registry.LocalMachine.OpenSubKey(path + @"\" + lsSubKey);
+                                    lsPublisher = subKey.GetValue("Publisher").ToString();
+                                }
+                                catch { }
                                 try
                                 {
                                     string lsDisplayName = "";
@@ -1079,10 +1298,28 @@ namespace Deliveries.SetupExe.Logic
                                     lsDisplayName = subKey.GetValue(searchforname).ToString();
                                     if (lsDisplayName != "")
                                     {
-                                        lsValue = lsValue.Replace("*", "");
-                                        if (lsDisplayName.ToLower().Contains(lsValue.ToLower()))
+                                        logger.Info("CheckExistingSoftware checking 32 " + lsDisplayName + " : " + lsPublisher, GlobalClass.SECTION);
+
+                                        if (lsUninstallType=="winget")
                                         {
-                                            NowUninstallSoftware(lsSubKey);
+                                            if (lsDisplayName.ToLower().Replace(" ", "").Contains(lsWingetProduct))
+                                            {
+                                                if (lsPublisher.ToLower().Replace(" ", "").Contains(lsWingetManufacturer))
+                                                {
+                                                    logger.Info("CheckExistingSoftware found 32 " + lsSubKey, GlobalClass.SECTION);
+
+                                                    lsReturn += lsSubKey + "|";
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            lsValue = lsValue.Replace("*", "");
+                                            if (lsDisplayName.ToLower().Contains(lsValue.ToLower()))
+                                            {
+                                                lsReturn += lsSubKey + "|";
+                                                //NowUninstallSoftware(lsSubKey);
+                                            }
                                         }
                                     }
                                 }
@@ -1112,7 +1349,8 @@ namespace Deliveries.SetupExe.Logic
                                             {
                                                 foreach (string lsInstallerKey in subregKey.GetValueNames())
                                                 {
-                                                    NowUninstallSoftware(ConvertInstallerToProductCode(lsInstallerKey));
+                                                    lsReturn += ConvertInstallerToProductCode(lsInstallerKey) + "|";
+                                                    //NowUninstallSoftware(ConvertInstallerToProductCode(lsInstallerKey));
                                                 }
                                             }
                                             catch { }
@@ -1131,6 +1369,31 @@ namespace Deliveries.SetupExe.Logic
                     break;
             }
 
+            if(lsReturn.EndsWith("|"))
+            {
+                lsReturn=lsReturn.Substring(0, lsReturn.Length-1);
+            }
+
+            return lsReturn;
+        }
+
+        public bool RemoveExistingSoftware(string lsUninstallType, string lsValue)
+        {
+            logger.Info("removeexistingproduct " + lsUninstallType + " " + lsValue, GlobalClass.SECTION);
+
+            string lsKeys = CheckExistingSoftware(lsUninstallType, lsValue);
+
+            logger.Info("found those keys to uninstall: " + lsKeys, GlobalClass.SECTION);
+
+            foreach(string lsKey in lsKeys.Split(Convert.ToChar("|")))
+            {
+                if (lsKey!="")
+                {
+                    logger.Info("uninstalling " + lsKey, GlobalClass.SECTION);
+                    NowUninstallSoftware(lsKey);
+                }
+            }
+       
             return true;
         }
 
@@ -1153,6 +1416,7 @@ namespace Deliveries.SetupExe.Logic
                 {
                     if (lsSubKey.ToLower() == lsUninstallKey.ToLower())
                     {
+                        logger.Warn("found " + lsUninstallKey + " in LocalMachine ", GlobalClass.SECTION);
 
                         RegistryKey subregKey = Registry.LocalMachine.OpenSubKey(path + @"\" + lsSubKey);
                         try
@@ -1196,6 +1460,8 @@ namespace Deliveries.SetupExe.Logic
                     {
                         if (lsSubKey.ToLower() == lsUninstallKey.ToLower())
                         {
+                            logger.Warn("found " + lsUninstallKey + " in LocalMachine (wow6432node) ", GlobalClass.SECTION);
+
                             RegistryKey subregKey = Registry.LocalMachine.OpenSubKey(path + @"\" + lsSubKey);
                             try
                             {
@@ -1236,7 +1502,7 @@ namespace Deliveries.SetupExe.Logic
                     string lsErrorMessage = "";
                     ExecuteCMD("msiexec", "/x " + lsProductCode + " /q REBOOT=ReallySuppress", ref lsErrorMessage, "true", new DataTable(), new DataTable());
                     lbFoundSomething=true;
-                }
+                }              
 
                 if(lsMachineKeyName != "")
                 {
@@ -1328,10 +1594,34 @@ namespace Deliveries.SetupExe.Logic
 
                             logger.Info("Finished Nullsoft uninstaller", GlobalClass.SECTION);
                         }
+                        else
+                        {
+                            logger.Info("Detected Unknown uninstaller", GlobalClass.SECTION);
+
+
+                            Process consoleProcess = new Process();
+                            consoleProcess.StartInfo.FileName = "cmd.exe";
+                            consoleProcess.StartInfo.Arguments = @"/c """ + lsUninstallString + @"""";
+                            consoleProcess.StartInfo.UseShellExecute = true;
+                            consoleProcess.StartInfo.CreateNoWindow = true;
+                            consoleProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+                            logger.Info("Running " + lsUninstallString, GlobalClass.SECTION);
+
+                            consoleProcess.Start();
+                            consoleProcess.WaitForExit();
+
+                            logger.Info("Finished Unknown uninstaller", GlobalClass.SECTION);
+                        }
                     }
                 }
 
                 //logger.Warn(lsUninstallString, GlobalClass.SECTION);
+            }
+            else
+            {
+                logger.Warn("unable to find uninstall method for " + lsUninstallKey, GlobalClass.SECTION);
+
             }
 
             return true;
@@ -2863,6 +3153,202 @@ WindowFound:
             return;
         }
 
+
+
+
+
+
+
+        // IFEO matches executable names across the machine, not just one folder.
+        private const string BlockExeKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
+        private const string BlockExeMarker = "cluebizBlockExe";
+
+        public void BlockExeFile(string path, DataTable variables, DataTable parameters)
+        {
+            lock (blockExeLock)
+            {
+                ReplaceEnvVariables(ref path, variables, parameters);
+                path = Path.GetFullPath(path);
+                string name = Path.GetFileName(path);
+                string dialogExe = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Deliveries.BlockExeDialog.exe");
+                if (!name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || name.Equals("Deliveries.BlockExeDialog.exe", StringComparison.OrdinalIgnoreCase))
+                    throw new ArgumentException("Invalid executable to block: " + path);
+                if (!File.Exists(dialogExe)) throw new FileNotFoundException("Deliveries.BlockExeDialog.exe must be beside SetupExe.", dialogExe);
+    
+                // Use the native registry view even when SetupExe is 32-bit.
+                RegistryView view = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
+                using (RegistryKey machine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, view))
+                using (RegistryKey root = machine.OpenSubKey(BlockExeKey, true))
+                using (RegistryKey key = root.CreateSubKey(name))
+                {
+                    if (key.GetValue(BlockExeMarker) != null)
+                        throw new InvalidOperationException("Executable is already blocked: " + name);
+                    object previous = key.GetValue("Debugger", null, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                    RegistryValueKind kind = previous == null ? RegistryValueKind.None : key.GetValueKind("Debugger");
+                    if (previous != null && kind != RegistryValueKind.String && kind != RegistryValueKind.ExpandString)
+                        throw new InvalidOperationException("Unsupported Debugger value: " + name);
+                    // Write recovery information before replacing the original debugger.
+                    key.SetValue(BlockExeMarker, previous == null ? "" : (string)previous, RegistryValueKind.String);
+                    // Double backslashes before quotes and at the end for Windows argument parsing.
+                    string productName = GlobalClass.BlockExeProductName ?? "";
+                    string escapedProductName = System.Text.RegularExpressions.Regex.Replace(productName, @"(\\*)""", "$1$1\\\"");
+                    escapedProductName += new string('\\', productName.Length - productName.TrimEnd('\\').Length);
+                    string debugger = "\"" + dialogExe + "\" -productname:\"" + escapedProductName +
+                        "\" -installdate:\"" + GlobalClass.BlockExeInstallDate.ToString("o") + "\"";
+                    key.SetValue("Debugger", debugger, RegistryValueKind.String);
+                }
+            }
+        }
+
+        // A null path restores all marked blocks during deployment cleanup.
+        public void UnblockExeFile(string path, DataTable variables, DataTable parameters)
+        {
+            lock (blockExeLock)
+            {
+                if (path == null)
+                {
+                    // Stop scans before restoring all marked registry entries.
+                    if (blockExeTimer != null) blockExeTimer.Dispose();
+                    blockExeTimer = null;
+                    BlockedFoldersDict.Clear();
+                    ExistingFoldersExeDict.Clear();
+                }
+                else ReplaceEnvVariables(ref path, variables, parameters);
+                // Read first; only open the registry for writing when a marker exists.
+                RegistryView view = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
+                using (RegistryKey machine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, view))
+                using (RegistryKey root = machine.OpenSubKey(BlockExeKey, false))
+                {
+                    foreach (string name in root.GetSubKeyNames())
+                    {
+                        if (path != null && !name.Equals(Path.GetFileName(path), StringComparison.OrdinalIgnoreCase)) continue;
+                        using (RegistryKey read = root.OpenSubKey(name))
+                        {
+                            if (read.GetValue(BlockExeMarker) == null) continue;
+                        }
+                        using (RegistryKey writableRoot = machine.OpenSubKey(BlockExeKey, true))
+                        {
+                            using (RegistryKey key = writableRoot.OpenSubKey(name, true))
+                            {
+                                object marker = key.GetValue(BlockExeMarker, null, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                                string previous = marker as string;
+                                // Also recover blocks made by the earlier test version.
+                                string[] oldMarker = marker as string[];
+                                if (oldMarker != null && oldMarker.Length == 4) previous = oldMarker[2];
+                                if (previous == null) continue;
+                                if (previous.Length == 0) key.DeleteValue("Debugger", false);
+                                else key.SetValue("Debugger", previous, RegistryValueKind.String);
+                                key.DeleteValue(BlockExeMarker, false);
+                                key.DeleteValue(BlockExeMarker + "Info", false);
+                            }
+                            // Do not remove keys containing other values or subkeys.
+                            using (RegistryKey key = writableRoot.OpenSubKey(name))
+                            {
+                                if (key == null || key.ValueCount != 0 || key.SubKeyCount != 0) continue;
+                            }
+                            writableRoot.DeleteSubKey(name, false);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        // The timer and deployment commands share the dictionaries and registry entries.
+        private static readonly object blockExeLock = new object();
+        private static System.Threading.Timer blockExeTimer;
+        // Folder path -> blocked file names, e.g. C:\Apps -> {App.exe, Tool.exe}.
+        // Names stay listed if their files are deleted.
+        private static readonly Dictionary<string, HashSet<string>> BlockedFoldersDict =
+            new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        // For type="new": folder path -> full paths of files present at startup.
+        // Example: C:\Apps -> {C:\Apps\App.exe}.
+        private static readonly Dictionary<string, HashSet<string>> ExistingFoldersExeDict =
+            new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        public void BlockExeFolder(string path, string type, DataTable variables, DataTable parameters)
+        {
+            ReplaceEnvVariables(ref path, variables, parameters);
+            path = Path.GetFullPath(path);
+            if (path.Length > Path.GetPathRoot(path).Length) path = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            lock (blockExeLock)
+            {
+                if (BlockedFoldersDict.ContainsKey(path)) throw new InvalidOperationException("Folder is already blocked: " + path);
+                var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                BlockedFoldersDict.Add(path, names);
+                Action<string, HashSet<string>> scanFolderForExe = (folder, blocked) =>
+                {
+                    string[] files = Directory.GetFiles(folder, "*.exe", SearchOption.AllDirectories);
+                    HashSet<string> existing;
+                    // Forget original files once a scan sees them removed; a later recreation is new.
+                    if (ExistingFoldersExeDict.TryGetValue(folder, out existing)) existing.IntersectWith(files);
+                    foreach (string file in files)
+                    {
+                        if (existing != null && existing.Contains(file)) continue;
+                        string name = Path.GetFileName(file);
+                        if (name.Equals("Deliveries.BlockExeDialog.exe", StringComparison.OrdinalIgnoreCase) || blocked.Contains(name)) continue;
+                        // IFEO uses names globally. Share a block when watched folders contain the same name.
+                        if (!BlockedFoldersDict.Values.Any(folderNames => folderNames.Contains(name))) BlockExeFile(file, variables, parameters);
+                        blocked.Add(name);
+                    }
+                };
+                try
+                {
+                    // Capture the baseline before the first scan so existing files are not blocked.
+                    if (type == "new")
+                        ExistingFoldersExeDict.Add(path, new HashSet<string>(Directory.GetFiles(path, "*.exe", SearchOption.AllDirectories), StringComparer.OrdinalIgnoreCase));
+                    scanFolderForExe(path, names);
+                    // One timer scans all registered folders every two seconds.
+                    if (blockExeTimer == null)
+                        blockExeTimer = new System.Threading.Timer(_ =>
+                        {
+                            lock (blockExeLock)
+                                foreach (var folder in BlockedFoldersDict)
+                                {
+                                    try { scanFolderForExe(folder.Key, folder.Value); }
+                                    catch (Exception ex) { GlobalClass.logger.Warn("Cannot scan blocked folder " + folder.Key + ": " + ex.Message, GlobalClass.SECTION); }
+                                }
+                        }, null, 2000, 2000);
+                }
+                catch
+                {
+                    // Undo the partial initial scan if registration fails.
+                    BlockedFoldersDict.Remove(path);
+                    ExistingFoldersExeDict.Remove(path);
+                    foreach (string name in names)
+                        if (!BlockedFoldersDict.Values.Any(folderNames => folderNames.Contains(name))) UnblockExeFile(name, variables, parameters);
+                    throw;
+                }
+            }
+        }
+
+        public void UnblockExeFolder(string path, DataTable variables, DataTable parameters)
+        {
+            ReplaceEnvVariables(ref path, variables, parameters);
+            path = Path.GetFullPath(path);
+            if (path.Length > Path.GetPathRoot(path).Length) path = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            lock (blockExeLock)
+            {
+                HashSet<string> names;
+                if (!BlockedFoldersDict.TryGetValue(path, out names)) return;
+                BlockedFoldersDict.Remove(path);
+                ExistingFoldersExeDict.Remove(path);
+                if (BlockedFoldersDict.Count == 0 && blockExeTimer != null)
+                {
+                    blockExeTimer.Dispose();
+                    blockExeTimer = null;
+                }
+                // Keep a shared name blocked until its last watched folder is removed.
+                foreach (string name in names)
+                    if (!BlockedFoldersDict.Values.Any(folderNames => folderNames.Contains(name))) UnblockExeFile(name, variables, parameters);
+            }
+        }
+
+
+
+
+
+
         public void KillProcessByPath(string path, DataTable loVarTable, DataTable loParameterTable)
         {
             string lsPath = path;
@@ -3569,6 +4055,208 @@ WindowFound:
 
             try
             {
+                // Check if wildcard is used.
+                if (path.Contains("*"))
+                {
+                    // * is only allowed as a complete folder segment: \*\
+                    if (!IsValidFolderWildcardPath(path))
+                    {
+                        // logging
+                        // writeToLogFile("Invalid wildcard path: " + path);
+                        return 1;
+                    }
+
+                    List<string> matchingFolders = GetMatchingFolders(path);
+
+                    foreach (string matchingFolder in matchingFolders)
+                    {
+                        try
+                        {
+                            if (Directory.Exists(matchingFolder))
+                            {
+                                try
+                                {
+                                    Directory.Delete(matchingFolder, true);
+                                }
+                                catch (UnauthorizedAccessException)
+                                {
+                                    // Use my own recursive method to reset
+                                    // file attributes and delete files.
+                                    DeleteRecursiveFolder(matchingFolder);
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            // logging
+                            // writeToLogFile("Could not delete folder: " + matchingFolder);
+                            return 1;
+                        }
+                    }
+
+                    return 0;
+                }
+
+                // Normal file handling.
+                if (File.Exists(path))
+                {
+                    try
+                    {
+                        File.Delete(path);
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        // Read-only file --> reset attribute.
+                        FileInfo filePath = new FileInfo(path);
+
+                        FileAttributes attribute =
+                            filePath.Attributes & ~FileAttributes.ReadOnly;
+
+                        File.SetAttributes(filePath.FullName, attribute);
+
+                        File.Delete(path);
+                    }
+                }
+
+                // Normal folder handling.
+                if (Directory.Exists(path))
+                {
+                    try
+                    {
+                        Directory.Delete(path, true);
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        // Use my own recursive method to reset
+                        // file attributes and delete files.
+                        DeleteRecursiveFolder(path);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // logging
+                return 1;
+            }
+
+            return 0;
+        }
+
+
+        private bool IsValidFolderWildcardPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                return false;
+
+            // * may not be first or last character.
+            if (path.StartsWith("*") || path.EndsWith("*"))
+                return false;
+
+            string[] parts = path.Split('\\');
+
+            foreach (string part in parts)
+            {
+                if (part.Contains("*"))
+                {
+                    // If a segment contains *, it must be exactly "*".
+                    if (part != "*")
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+
+        private List<string> GetMatchingFolders(string pattern)
+        {
+            List<string> currentFolders = new List<string>();
+
+            string[] parts = pattern.Split(
+                new char[] { '\\' },
+                StringSplitOptions.RemoveEmptyEntries
+            );
+
+            int firstWildcard = Array.IndexOf(parts, "*");
+
+            if (firstWildcard < 0)
+                return currentFolders;
+
+            // Build path up to first wildcard.
+            //
+            // Example:
+            // C:\Users\*\AppData\...
+            //
+            // becomes:
+            // C:\Users
+
+            string rootPath = parts[0] + "\\";
+
+            for (int i = 1; i < firstWildcard; i++)
+            {
+                rootPath = Path.Combine(rootPath, parts[i]);
+            }
+
+            if (!Directory.Exists(rootPath))
+                return currentFolders;
+
+            currentFolders.Add(rootPath);
+
+            // Process every component after the fixed root.
+            for (int i = firstWildcard; i < parts.Length; i++)
+            {
+                string part = parts[i];
+
+                List<string> nextFolders = new List<string>();
+
+                foreach (string currentFolder in currentFolders)
+                {
+                    try
+                    {
+                        if (part == "*")
+                        {
+                            // * means exactly ONE folder level.
+                            foreach (string folder in Directory.GetDirectories(currentFolder))
+                            {
+                                nextFolders.Add(folder);
+                            }
+                        }
+                        else
+                        {
+                            string folder = Path.Combine(currentFolder, part);
+
+                            if (Directory.Exists(folder))
+                            {
+                                nextFolders.Add(folder);
+                            }
+                        }
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        // Ignore folders that cannot be enumerated.
+                    }
+                    catch (IOException)
+                    {
+                        // Ignore invalid/inaccessible folders.
+                    }
+                }
+
+                currentFolders = nextFolders;
+
+                if (currentFolders.Count == 0)
+                    break;
+            }
+
+            return currentFolders;
+        }
+
+
+        public int RemoveFileOrFolderX(string path, DataTable loVarTable, DataTable loParameterTable)
+        {
+            ReplaceEnvVariables(ref path, loVarTable, loParameterTable);
+
+            try
+            {
                 if (File.Exists(path))
                 {
                     try
@@ -3862,6 +4550,12 @@ WindowFound:
             }
 
             //replace datetime
+
+            path = path.Replace("%Time%", DateTime.Now.ToString("HH:mm:ss"));
+            path = path.Replace("%Date%", DateTime.Now.ToString("yyyy-MM-dd"));
+            path = path.Replace("%DateTime%", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
+            path = path.Replace("%CurrentFolder%", System.IO.Path.GetDirectoryName(GlobalClass.ApplicationPath));
+
 
             path = Regex.Replace(path, "%Time%", DateTime.Now.ToString("HH:mm:ss"), RegexOptions.IgnoreCase);
             path = Regex.Replace(path, "%Date%", DateTime.Now.ToString("yyyy-MM-dd"), RegexOptions.IgnoreCase);

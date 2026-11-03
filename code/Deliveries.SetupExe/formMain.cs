@@ -75,10 +75,9 @@ namespace SetupExe
         private string LOG_TASKS_FILE = "[ProductCode].log";
         private string LOG_MSI = "%SYSTEMROOT%\\debug\\MSIPackages\\";
         private string LOG_MSI_FILE = "[ProductCode].log";
-        private string ACTIVESETUPLANGUAGE = "";
+        private string ACTIVESETUPLANGUAGE = "powershell";
 
-        const string STARTALTIRISTASKSCRIPT = "startAltirisTask.vbs";
-        private string startAltirisTaskScriptPath = "%programfiles%\\" + Application.CompanyName + "\\" + Application.CompanyName + "_setupExe\\";
+               
         private string typelabel = "Installation"; //default (Installation/Uninstallation/Repair)
         private string XSDversion = "unknown";
         private string loggedOnUser = "unknown";
@@ -319,7 +318,10 @@ namespace SetupExe
 
             try
             {
-                if (Properties.Settings.Default.ActiveSetupLanguage != "")
+                GlobalClass.logger.Info("ACTIVESETUPLANGUAGE is " + ACTIVESETUPLANGUAGE, GlobalClass.SECTION);
+                ACTIVESETUPLANGUAGE = ReplaceLogVars(Properties.Settings.Default.ActiveSetupLanguage);
+                GlobalClass.logger.Info("ACTIVESETUPLANGUAGE patching to " + ACTIVESETUPLANGUAGE, GlobalClass.SECTION);
+                if (Properties.Settings.Default.ActiveSetupLanguage == "vbscript")
                 {
                     ACTIVESETUPLANGUAGE = ReplaceLogVars(Properties.Settings.Default.ActiveSetupLanguage);
                 }
@@ -564,8 +566,8 @@ namespace SetupExe
 
                     //set global command line (for scheduled tasks) & generate script.
                     GlobalClass.GlobalCommandLine = (char)34 + currentExecutable + (char)34 + parameterstotal;
-                    myFunctions.ReplaceEnvVariables(ref startAltirisTaskScriptPath, new DataTable(), new DataTable());
-                    GlobalClass.GlobalStartAltirisTask = "wscript.exe " + (char)34 + startAltirisTaskScriptPath + STARTALTIRISTASKSCRIPT + (char)34;
+                    //myFunctions.ReplaceEnvVariables(ref startAltirisTaskScriptPath, new DataTable(), new DataTable());
+                    //GlobalClass.GlobalStartAltirisTask = "wscript.exe " + (char)34 + startAltirisTaskScriptPath + STARTALTIRISTASKSCRIPT + (char)34;
 
                     //removed by adrian
                     //CreateScriptFile(startAltirisTaskScriptPath, STARTALTIRISTASKSCRIPT);
@@ -589,9 +591,6 @@ namespace SetupExe
 
 
 
-
-
-
                     //get directory size
                     //double TotalDirectorySize = Folder.Size(@currentPath, true);
 
@@ -610,6 +609,7 @@ namespace SetupExe
                     GlobalClass.logger.Info("Current (source) folder: '" + currentPath + "'", GlobalClass.SECTION);
                     //logger.Info("Total folder size: " + TotalDirectorySize.ToString() + " Bytes");
                     GlobalClass.logger.Info("Interactive mode: " + Environment.UserInteractive.ToString(), GlobalClass.SECTION);
+                    GlobalClass.logger.Info("Active setup mode: " + ACTIVESETUPLANGUAGE, GlobalClass.SECTION);
                     GlobalClass.logger.WritetoEventLog("Start '" + pc.MainModule.FileName + "'; " + "Parameter: 'XML=" + parameterXMLFile + " TYPE=" + parameterTYPE + "'", LINFO, GlobalClass.SECTION);
 
                     //set new location on screen (bottom right)
@@ -678,6 +678,7 @@ namespace SetupExe
 
         public void StartWorking()
         {
+            GlobalClass.BlockExeInstallDate = DateTime.Now;
             //GUI shouldn't be visible at start
             this.Invoke(new MethodInvoker(DisableGUI));
 
@@ -725,6 +726,9 @@ namespace SetupExe
 
             try
             {
+                // Recover blocks left by an interrupted installation.
+                myFunctions.UnblockExeFile(null, GlobalClass.VarTable, GlobalClass.ParameterTable);
+
                 //XML Validation (XSD Schema)
                 XmlReaderSettings deploySettings = new XmlReaderSettings();
                 deploySettings.Schemas.Add(null, currentPath + "\\" + XMLSCHEMAFILE);
@@ -759,6 +763,7 @@ namespace SetupExe
                         XmlElement package = nd as XmlElement;
                         XmlElement elproductname = (XmlElement)package.SelectSingleNode("//" + XMLNAMESPACE + ":productname", nsmgr);
                         productname = elproductname.InnerText;
+                        GlobalClass.BlockExeProductName = productname;
                         XmlElement elproductversion = (XmlElement)package.SelectSingleNode("//" + XMLNAMESPACE + ":productversion", nsmgr);
                         productversion = elproductversion.InnerText;
                         XmlElement elproductcode = (XmlElement)package.SelectSingleNode("//" + XMLNAMESPACE + ":productcode", nsmgr);
@@ -1228,6 +1233,10 @@ namespace SetupExe
                         }
                     }
                     catch { }
+
+
+                    ACTIVESETUPLANGUAGE="powershell";
+
                     GlobalClass.logger.Info(lsIntializeText, GlobalClass.SECTION);
                     GlobalClass.logger.Info("METADATA: '" + manufacturer + " " + productname + "';" + productcode + ";" + productversion + ";" + type + ";" + packager + ";" + creationdate, GlobalClass.SECTION);
                     GlobalClass.logger.Info("TASK QUEUE TYPE: " + installtype, GlobalClass.SECTION);
@@ -1237,6 +1246,8 @@ namespace SetupExe
                     GlobalClass.logger.Info("XML node to parse: '" + nodetoparse + "'", GlobalClass.SECTION);
                     GlobalClass.logger.Info("USERINSTALL Part: '" + hasuserinstall.ToString() + "'", GlobalClass.SECTION);
                     GlobalClass.logger.Info("USERUNINSTALL Part: '" + hasuseruninstall.ToString() + "'", GlobalClass.SECTION);
+                    GlobalClass.logger.Info("ACTIVESETUP: '" + ACTIVESETUPLANGUAGE.ToString() + "'", GlobalClass.SECTION);
+                    GlobalClass.logger.Info("ACTIVESETUP O: '" + Properties.Settings.Default.ActiveSetupLanguage.ToString(), GlobalClass.SECTION);
                     GlobalClass.logger.WritetoEventLog("Start setup queue (" + installtype + ") - '" + productname + "'", LINFO, GlobalClass.SECTION);
 
 
@@ -1317,6 +1328,47 @@ namespace SetupExe
                         GlobalClass.DesktopFilesBefore = Directory.GetFiles(Environment.ExpandEnvironmentVariables(@"%Public%\Desktop"), "*.*", SearchOption.AllDirectories);
                     }
                     catch { }
+
+
+                    //read files
+                    try
+                    {
+                        GlobalClass.UserStartMenuFilesBefore = Directory.GetFiles(Environment.ExpandEnvironmentVariables(@"%APPDATA%\Microsoft\Windows\Start Menu"), "*.*", SearchOption.AllDirectories);
+                    }
+                    catch { }
+
+                    //read files
+                    try
+                    {
+                        GlobalClass.UserDesktopFilesBefore = Directory.GetFiles(Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Desktop"), "*.*", SearchOption.AllDirectories);
+                    }
+                    catch { }
+
+
+                    GlobalClass.ActiveSetupAdvancedBefore=new DataTable();
+                    GlobalClass.ActiveSetupAdvancedBefore.Columns.Add("key");
+                    GlobalClass.ActiveSetupAdvancedBefore.Columns.Add("command");
+                    try
+                    {
+                        RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Active Setup Advanced");
+                        foreach (string lsSubKey in regKey.GetSubKeyNames())
+                        {
+                            DataRow loActiveSetupAdvancedRow = GlobalClass.ActiveSetupAdvancedBefore.NewRow();
+                            loActiveSetupAdvancedRow["key"] = System.IO.Path.GetFileName(lsSubKey);
+                            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Active Setup Advanced\" + loActiveSetupAdvancedRow["key"].ToString()))
+                            {
+                                loActiveSetupAdvancedRow["command"] = key.GetValue("command").ToString();
+                            }
+                            GlobalClass.ActiveSetupAdvancedBefore.Rows.Add(loActiveSetupAdvancedRow);
+                        }
+                    }
+                    catch { }
+
+
+                    GlobalClass.ActiveSetupAdvancedAfter = new DataTable();
+                    GlobalClass.ActiveSetupAdvancedAfter.Columns.Add("key");
+                    GlobalClass.ActiveSetupAdvancedAfter.Columns.Add("command");
+
 
                     GlobalClass.UninstallBefore = new DataTable();
                     GlobalClass.UninstallBefore.Columns.Add("key");
@@ -1413,6 +1465,24 @@ namespace SetupExe
                         }
 
 
+                        try
+                        {
+                            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Active Setup Advanced");
+                            foreach (string lsSubKey in regKey.GetSubKeyNames())
+                            {
+                                DataRow loActiveSetupAdvancedRow = GlobalClass.ActiveSetupAdvancedAfter.NewRow();
+                                loActiveSetupAdvancedRow["key"] = System.IO.Path.GetFileName(lsSubKey);
+                                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Active Setup Advanced\" + loActiveSetupAdvancedRow["key"].ToString()))
+                                {
+                                    loActiveSetupAdvancedRow["command"] = key.GetValue("command").ToString();
+                                }
+                                GlobalClass.ActiveSetupAdvancedBefore.Rows.Add(loActiveSetupAdvancedRow);
+                            }
+                        }
+                        catch { }
+
+                        
+
 
                         //create activesetup
                         switch (installtype)
@@ -1448,7 +1518,7 @@ namespace SetupExe
                                                     myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "ComponentId", productname, "REG_SZ", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
                                                     myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "DontAsk", "1", "REG_DWORD", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
                                                     myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "IsInstalled", "1", "REG_DWORD", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
-                                                    myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "StubPath", @"powershell -ExecutionPolicy Bypass -file """ + Environment.ExpandEnvironmentVariables(maininstallfolderx64) + @"\ActiveSetup.ps1""", "REG_SZ", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
+                                                    myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "StubPath", @"powershell -ExecutionPolicy Bypass -WindowStyle hidden -file """ + Environment.ExpandEnvironmentVariables(maininstallfolderx64) + @"\ActiveSetup.ps1""", "REG_SZ", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
                                                     if (internalversion != "")
                                                     {
                                                         myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "Version", internalversion, "REG_SZ", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
@@ -1508,12 +1578,14 @@ namespace SetupExe
                                                     myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "ComponentId", productname, "REG_SZ", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
                                                     myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "DontAsk", "1", "REG_DWORD", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
                                                     myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "IsInstalled", "1", "REG_DWORD", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
-                                                    myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "StubPath", @"powershell -ExecutionPolicy Bypass -file """ + Environment.ExpandEnvironmentVariables(maininstallfolderx86) + @"\ActiveSetup.ps1""", "REG_SZ", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
+                                                    myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "StubPath", @"powershell -ExecutionPolicy Bypass -WindowStale hidden -file """ + Environment.ExpandEnvironmentVariables(maininstallfolderx86) + @"\ActiveSetup.ps1""", "REG_SZ", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
                                                     if (internalversion != "")
                                                     {
                                                         myFunctions.AddRegKey(@"HKLM\Software\Microsoft\Active Setup\Installed Components\" + lsGuid, "Version", internalversion, "REG_SZ", GlobalClass.VarTable, GlobalClass.ParameterTable, ref lsError);
                                                     }
 
+                                                    break;
+                                                case "none":
                                                     break;
                                                 default:
                                                     try
@@ -1636,7 +1708,7 @@ namespace SetupExe
                                         {
                                             if (System.IO.File.Exists(Environment.ExpandEnvironmentVariables(maininstallfolderx86) + @"\ActiveSetup.ps1"))
                                             {
-                                                lsCMD = @"powershell.exe -file """ + Environment.ExpandEnvironmentVariables(maininstallfolderx86) + @"\ActiveSetup.ps1""";
+                                                lsCMD = @"powershell.exe -windowstyle hidden -file """ + Environment.ExpandEnvironmentVariables(maininstallfolderx86) + @"\ActiveSetup.ps1""";
                                                 lbDoneSomething = true;
                                             }
                                         }
@@ -1644,7 +1716,7 @@ namespace SetupExe
                                         {
                                             if (System.IO.File.Exists(Environment.ExpandEnvironmentVariables(maininstallfolderx64) + @"\ActiveSetup.ps1"))
                                             {
-                                                lsCMD = @"powershell.exe -file """ + Environment.ExpandEnvironmentVariables(maininstallfolderx64) + @"\ActiveSetup.ps1"""; ;
+                                                lsCMD = @"powershell.exe -windowstyle hidden -file """ + Environment.ExpandEnvironmentVariables(maininstallfolderx64) + @"\ActiveSetup.ps1"""; ;
                                                 lbDoneSomething = true;
                                             }
                                         }
@@ -1666,6 +1738,30 @@ namespace SetupExe
                                         }
                                     }
                                     catch { }
+
+                                    //now active setup advanced
+
+                                    if(GlobalClass.ActiveSetupAdvancedBefore.Rows.Count != GlobalClass.ActiveSetupAdvancedAfter.Rows.Count)
+                                    {
+                                        foreach(DataRow loActiveSetupAdvancedAfterRow in GlobalClass.ActiveSetupAdvancedAfter.Rows)
+                                        {
+                                            bool lbFoundSomething = false;
+                                            foreach (DataRow loActiveSetupAdvancedBeforeRow in GlobalClass.ActiveSetupAdvancedAfter.Rows)
+                                            {
+                                                if (loActiveSetupAdvancedBeforeRow["key"].ToString()==loActiveSetupAdvancedAfterRow["key"].ToString())
+                                                {
+                                                    lbFoundSomething=true;
+                                                    break;
+                                                }
+                                            }
+                                            if(!lbFoundSomething)
+                                            {
+                                                lsCMD = loActiveSetupAdvancedAfterRow["command"].ToString();
+                                            }
+                                        }
+                                    }
+
+
                                     try
                                     {
                                         if (lsCMD != "")
@@ -1779,6 +1875,16 @@ namespace SetupExe
 
         private void PostWorkingTask()
         {
+            try
+            {
+                // Stop folder scans and restore blocked executables, including after task failures.
+                new Functions().UnblockExeFile(null, GlobalClass.VarTable, GlobalClass.ParameterTable);
+            }
+            catch (Exception ex)
+            {
+                GlobalClass.logger.Error("Could not restore blocked executables: " + ex.Message, GlobalClass.SECTION);
+            }
+			
             bool applicationExit = false;
             this.Invoke(new MethodInvoker(DisableAnimatedGif));
             GlobalClass.logger.Info("---- POST " + typelabel + " tasks . start ----", GlobalClass.SECTION);

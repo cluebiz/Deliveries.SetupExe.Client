@@ -33,7 +33,7 @@
       <Value Profile="(Default)">true</Value>
     </Setting>
     <Setting Name="ActiveSetupLanguage" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">vbscript</Value>
+      <Value Profile="(Default)">powershell</Value>
     </Setting>
   </Settings>
 </SettingsFile>

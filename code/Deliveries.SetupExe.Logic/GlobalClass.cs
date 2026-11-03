@@ -31,6 +31,8 @@ namespace Deliveries.SetupExe.Logic
         private static string applicationpath = "";
         public static Logging logger = new Logging();
         public static string SECTION = "install";
+        public static string BlockExeProductName = "";
+        public static DateTime BlockExeInstallDate;
 
         //ExitCodes
         public const int EC_UnknownException = 1001;
@@ -55,8 +57,16 @@ namespace Deliveries.SetupExe.Logic
         public static string[] DesktopFilesBefore;
         public static string[] DesktopFilesAfter;
 
+        public static string[] UserStartMenuFilesBefore;
+        public static string[] UserStartMenuFilesAfter;
+        public static string[] UserDesktopFilesBefore;
+        public static string[] UserDesktopFilesAfter;
+
+
         public static DataTable UninstallBefore;
         public static DataTable UninstallAfter;
+        public static DataTable ActiveSetupAdvancedBefore;
+        public static DataTable ActiveSetupAdvancedAfter;
 
         public static DataTable VarTable = new DataTable();
         public static DataTable ParameterTable = new DataTable();
@@ -178,11 +188,11 @@ namespace Deliveries.SetupExe.Logic
             set { globalcommandline = value; }
         }
 
-        public static string GlobalStartAltirisTask
-        {
-            get { return globalstartaltiristask; }
-            set { globalstartaltiristask = value; }
-        }
+        //public static string GlobalStartAltirisTask
+        //{
+        //    get { return globalstartaltiristask; }
+        //    set { globalstartaltiristask = value; }
+        //}
 
         public static string LogFileProductCode
         {

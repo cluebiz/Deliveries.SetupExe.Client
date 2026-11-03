@@ -99,6 +99,56 @@ namespace Deliveries.SetupExe.Logic
                 case "checkfullscreen":
                     break;
 
+                case "checkexistingsoftware":
+                    {
+                        string type = node.Attributes.GetNamedItem("type").Value.ToString();
+                        string value = node.Attributes.GetNamedItem("value").Value.ToString();
+                        bool lbfound = true;
+
+                        foreach (XmlNode checkexistingsoftwareChildnode in node.ChildNodes)
+                        {
+                            switch (checkexistingsoftwareChildnode.Name)
+                            {
+                                case "exists":
+                                    {
+                                        if (lbfound)
+                                        {
+                                            foreach (XmlNode msiexistsnode in checkexistingsoftwareChildnode.ChildNodes)
+                                            {
+                                                abort = ExecuteTask(msiexistsnode);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            GlobalClass.logger.Info(":: USERUNINSTALL " + node.Name + " --> '" + node.Attributes.GetNamedItem("package").Value.ToString() + "' NOT existing.", GlobalClass.SECTION);
+
+                                        }
+                                    }
+                                    break;
+                                case "notexists":
+                                    {
+                                        if (!lbfound)
+                                        {
+                                            foreach (XmlNode msiexistsnode in checkexistingsoftwareChildnode.ChildNodes)
+                                            {
+                                                abort = ExecuteTask(msiexistsnode);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            GlobalClass.logger.Info(":: USERUNINSTALL " + node.Name + " --> '" + node.Attributes.GetNamedItem("package").Value.ToString() + "' existing.", GlobalClass.SECTION);
+
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        
+                       
+
+                    }
+                    break;
+
                 case "checkmsiinstallation":
                     string GUID = myFunctions.GetInstalledGUID(node.Attributes.GetNamedItem("package").Value.ToString());
                     foreach (XmlNode checkmsiChildnode in node.ChildNodes)
@@ -1139,7 +1189,7 @@ namespace Deliveries.SetupExe.Logic
                         }
                         catch { }
 
-                        if (myFunctions.RemoveShortcuts(path, filename, mode, GlobalClass.StartMenuFilesBefore, GlobalClass.DesktopFilesBefore))
+                        if (myFunctions.RemoveShortcuts(path, filename, mode, GlobalClass.StartMenuFilesBefore, GlobalClass.DesktopFilesBefore, GlobalClass.UserStartMenuFilesBefore, GlobalClass.UserDesktopFilesBefore))
                         {
                             GlobalClass.logger.Info(":: USERUNINSTALL " + node.Name + " --> RemoveShortcuts created successfully", GlobalClass.SECTION);
                         }

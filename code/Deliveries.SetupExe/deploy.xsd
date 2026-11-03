@@ -270,6 +270,23 @@
           <xs:attribute name="path" use="required" type="notemptystring"/>
         </xs:complexType>
       </xs:element>
+      <xs:element name="blockexefile">
+        <xs:complexType><xs:attribute name="path" use="required" type="notemptystring"/></xs:complexType>
+      </xs:element>
+      <xs:element name="blockexefolder">
+        <xs:complexType>
+          <xs:attribute name="path" use="required" type="notemptystring"/>
+          <xs:attribute name="type" use="optional" default="all">
+            <xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="all"/><xs:enumeration value="new"/></xs:restriction></xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="unblockexefile">
+        <xs:complexType><xs:attribute name="path" use="required" type="notemptystring"/></xs:complexType>
+      </xs:element>
+      <xs:element name="unblockexefolder">
+        <xs:complexType><xs:attribute name="path" use="required" type="notemptystring"/></xs:complexType>
+      </xs:element>
       <xs:element name="checkdisk">
         <xs:complexType>
           <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
@@ -807,6 +824,7 @@
         </xs:complexType>
       </xs:element>
       
+	 
 	  <xs:element name="removeexistingsoftware">
 	  <xs:complexType>
 		<xs:attribute name="uninstalltype" use="required">
@@ -815,7 +833,7 @@
                 <xs:enumeration value="displayname"/>
                 <xs:enumeration value="productcode"/>
                 <xs:enumeration value="upgradecode"/>
-				<xs:enumeration value="machinekeyname"/>
+				<xs:enumeration value="winget"/>
               </xs:restriction>
             </xs:simpleType>
           </xs:attribute>
@@ -823,12 +841,44 @@
 	  </xs:complexType>
 	  </xs:element>
 	  
+	  <xs:element name="checkexistingsoftware">
+        <xs:complexType>
+          <xs:choice maxOccurs="2" minOccurs="0">
+            <xs:element name="exists" maxOccurs="1">
+              <xs:complexType>
+                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="notexists" maxOccurs="1">
+              <xs:complexType>
+                <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+          <xs:attribute name="uninstalltype" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="displayname"/>
+                <xs:enumeration value="productcode"/>
+                <xs:enumeration value="upgradecode"/>
+				<xs:enumeration value="winget"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+		<xs:attribute name="value" use="required" type="notemptystring" />
+        </xs:complexType>
+      </xs:element>
+	  
+
+
+	  
       <xs:element name="checkmemory">
         <xs:complexType>
           <xs:group ref="TaskQueue" minOccurs="1" maxOccurs="unbounded"/>
           <xs:attribute name="memory" type="xs:positiveInteger"/>
         </xs:complexType>
       </xs:element>     
+
       <xs:element name="getoslanguage">
          <xs:complexType>
           <xs:choice maxOccurs="unbounded" minOccurs="0">

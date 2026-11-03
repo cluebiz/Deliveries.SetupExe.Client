@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="deploy.xsl"?>
+<deploy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="deploy.xsd">
+  <metadata>
+    <productname>Docugate</productname>
+    <productversion>5</productversion>
+    <productcode>{71909647-BADE-43FA-AD84-0CDD92CBD1AB}</productcode>
+    <manufacturer>Leuchter IT Solutions</manufacturer>
+    <packager>shop</packager>
+    <creationdate>2025-06-26</creationdate>
+    <type>msi</type>
+    <releaseversion>5.20.7.0</releaseversion>
+    <languages>DE;EN;ES;IT;FR</languages>
+    <architecture>x86</architecture>
+  </metadata>
+  <install>
+    <tasks>
+      <checkmsiinstallation package="{71909647-BADE-43FA-AD84-0CDD92CBD1AB}">
+        <notexists>
+          <checkprocess name="DocugateAdmin" loop="false">
+            <killprocess name="DocugateAdmin" />
+          </checkprocess>
+          <checkprocess name="Docugate" loop="false">
+            <killprocess name="Docugate" />
+          </checkprocess>
+          <checkprocess name="DocugateDataAdmin" loop="false">
+            <killprocess name="DocugateDataAdmin" />
+          </checkprocess>
+          <msiexec>
+            <parameters>
+              <parameter>/i</parameter>
+              <parameter>"Docugate.msi"</parameter>
+              <parameter>TRANSFORMS="Docugate.mst"</parameter>
+              <parameter>DGCONFIGSOURCEDIR="%CurrentFolder%"</parameter>
+              <parameter>/qb!-</parameter>
+              <parameter>/l*v "%systemroot%\debug\msipackages\{71909647-BADE-43FA-AD84-0CDD92CBD1AB}.log"</parameter>
+              <parameter>REBOOT=ReallySuppress</parameter>
+              <parameter>ALLUSERS=1</parameter>
+              <parameter>ROOTDRIVE=C:</parameter>
+              <parameter>MSIRMSHUTDOWN=2</parameter>
+              <parameter>MSIDISABLERMRESTART=1</parameter>
+              <parameter>MSIRESTARTMANAGERCONTROL=DisableShutdown</parameter>
+            </parameters>
+          </msiexec>
+          <sleep seconds="30" />
+        </notexists>
+      </checkmsiinstallation>
+      <checkmsiinstallation package="{24BF3ECB-2AB9-4DA0-8EC4-2B2BE331D909}">
+        <notexists>
+          <checkprocess name="SysId" loop="false">
+            <killprocess name="SysId" />
+          </checkprocess>
+          <msiexec>
+            <parameters>
+              <parameter>/i</parameter>
+              <parameter>"TBarCode_10_0_0.msi"</parameter>
+              <parameter>TRANSFORMS="TBarCode_10_0_0.mst"</parameter>
+              <parameter>/qb!-</parameter>
+              <parameter>/l*v "%systemroot%\debug\msipackages\{24BF3ECB-2AB9-4DA0-8EC4-2B2BE331D909}.log"</parameter>
+              <parameter>REBOOT=ReallySuppress</parameter>
+              <parameter>ALLUSERS=1</parameter>
+              <parameter>ROOTDRIVE=C:</parameter>
+              <parameter>MSIRMSHUTDOWN=2</parameter>
+              <parameter>MSIDISABLERMRESTART=1</parameter>
+              <parameter>MSIRESTARTMANAGERCONTROL=DisableShutdown</parameter>
+            </parameters>
+          </msiexec>
+        </notexists>
+      </checkmsiinstallation>
+      <checkmsiinstallation package="{B81BF210-F29F-4CDB-ACB3-FB7E71763468}">
+        <notexists>
+          <msiexec>
+            <parameters>
+              <parameter>/i</parameter>
+              <parameter>"setup.msi"</parameter>
+              <parameter>/qb!-</parameter>
+              <parameter>/l*v "%systemroot%\debug\msipackages\{B81BF210-F29F-4CDB-ACB3-FB7E71763468}.log"</parameter>
+              <parameter>REBOOT=ReallySuppress</parameter>
+              <parameter>ALLUSERS=1</parameter>
+              <parameter>ROOTDRIVE=C:</parameter>
+              <parameter>MSIRMSHUTDOWN=2</parameter>
+              <parameter>MSIDISABLERMRESTART=1</parameter>
+              <parameter>MSIRESTARTMANAGERCONTROL=DisableShutdown</parameter>
+            </parameters>
+          </msiexec>
+        </notexists>
+      </checkmsiinstallation>
+      <copyfolder source="DATA" destination="%ProgramFiles(x86)%\Leuchter AG\DATA" overwrite="true" />
+      <addshortcut path="%ProgramData%\Microsoft\Windows\Start Menu\Programs\Docugate.lnk" destination="%ProgramFiles(x86)%\Leuchter AG\Docugate\Docugate.exe" />
+      <execute path="regedit.exe">
+        <parameters>
+          <parameter>/s</parameter>
+          <parameter>"%CurrentFolder%\docugate.reg"</parameter>
+        </parameters>
+      </execute>
+    </tasks>
+  </install>
+  <uninstall>
+    <tasks>
+      <removeshortcuts path="%ProgramData%\Microsoft\Windows\Start Menu\Programs" filename="Docugate.lnk" />
+      <removefolder path="%ProgramFiles%\Leuchter AG\DATA" />
+      <checkmsiinstallation package="{B81BF210-F29F-4CDB-ACB3-FB7E71763468}">
+        <exists>
+          <msiexec>
+            <parameters>
+              <parameter>/x</parameter>
+              <parameter>{B81BF210-F29F-4CDB-ACB3-FB7E71763468}</parameter>
+              <parameter>/qb!-</parameter>
+              <parameter>/l*v "%systemroot%\debug\msipackages\{B81BF210-F29F-4CDB-ACB3-FB7E71763468}.log"</parameter>
+              <parameter>REBOOT=ReallySuppress</parameter>
+              <parameter>ROOTDRIVE=C:</parameter>
+              <parameter>MSIRMSHUTDOWN=2</parameter>
+              <parameter>MSIDISABLERMRESTART=1</parameter>
+              <parameter>MSIRESTARTMANAGERCONTROL=DisableShutdown</parameter>
+            </parameters>
+          </msiexec>
+        </exists>
+      </checkmsiinstallation>
+      <checkmsiinstallation package="{24BF3ECB-2AB9-4DA0-8EC4-2B2BE331D909}">
+        <exists>
+          <checkprocess name="SysId" loop="false">
+            <killprocess name="SysId" />
+          </checkprocess>
+          <msiexec>
+            <parameters>
+              <parameter>/x</parameter>
+              <parameter>{24BF3ECB-2AB9-4DA0-8EC4-2B2BE331D909}</parameter>
+              <parameter>/qb!-</parameter>
+              <parameter>/l*v "%systemroot%\debug\msipackages\{24BF3ECB-2AB9-4DA0-8EC4-2B2BE331D909}.log"</parameter>
+              <parameter>REBOOT=ReallySuppress</parameter>
+              <parameter>ROOTDRIVE=C:</parameter>
+              <parameter>MSIRMSHUTDOWN=2</parameter>
+              <parameter>MSIDISABLERMRESTART=1</parameter>
+              <parameter>MSIRESTARTMANAGERCONTROL=DisableShutdown</parameter>
+            </parameters>
+          </msiexec>
+        </exists>
+      </checkmsiinstallation>
+      <checkmsiinstallation package="{71909647-BADE-43FA-AD84-0CDD92CBD1AB}">
+        <exists>
+          <checkprocess name="DocugateAdmin" loop="false">
+            <killprocess name="DocugateAdmin" />
+          </checkprocess>
+          <checkprocess name="Docugate" loop="false">
+            <killprocess name="Docugate" />
+          </checkprocess>
+          <checkprocess name="DocugateDataAdmin" loop="false">
+            <killprocess name="DocugateDataAdmin" />
+          </checkprocess>
+          <msiexec>
+            <parameters>
+              <parameter>/x</parameter>
+              <parameter>{71909647-BADE-43FA-AD84-0CDD92CBD1AB}</parameter>
+              <parameter>/qb!-</parameter>
+              <parameter>/l*v "%systemroot%\debug\msipackages\{71909647-BADE-43FA-AD84-0CDD92CBD1AB}.log"</parameter>
+              <parameter>REBOOT=ReallySuppress</parameter>
+              <parameter>ROOTDRIVE=C:</parameter>
+              <parameter>MSIRMSHUTDOWN=2</parameter>
+              <parameter>MSIDISABLERMRESTART=1</parameter>
+              <parameter>MSIRESTARTMANAGERCONTROL=DisableShutdown</parameter>
+            </parameters>
+          </msiexec>
+        </exists>
+      </checkmsiinstallation>
+    </tasks>
+  </uninstall>
+  <repair>
+    <tasks>
+      <checkmsiinstallation package="{71909647-BADE-43FA-AD84-0CDD92CBD1AB}">
+        <exists>
+          <checkprocess name="DocugateAdmin" loop="false">
+            <killprocess name="DocugateAdmin" />
+          </checkprocess>
+          <checkprocess name="Docugate" loop="false">
+            <killprocess name="Docugate" />
+          </checkprocess>
+          <checkprocess name="DocugateDataAdmin" loop="false">
+            <killprocess name="DocugateDataAdmin" />
+          </checkprocess>
+          <msiexec>
+            <parameters>
+              <parameter>/fvomus</parameter>
+              <parameter>{71909647-BADE-43FA-AD84-0CDD92CBD1AB}</parameter>
+              <parameter>/qb!-</parameter>
+              <parameter>/l*v "%systemroot%\debug\msipackages\{71909647-BADE-43FA-AD84-0CDD92CBD1AB}.log"</parameter>
+              <parameter>REBOOT=ReallySuppress</parameter>
+              <parameter>ROOTDRIVE=C:</parameter>
+              <parameter>MSIRMSHUTDOWN=2</parameter>
+              <parameter>MSIDISABLERMRESTART=1</parameter>
+              <parameter>MSIRESTARTMANAGERCONTROL=DisableShutdown</parameter>
+            </parameters>
+          </msiexec>
+        </exists>
+      </checkmsiinstallation>
+    </tasks>
+  </repair>
+  <configuration />
+</deploy>

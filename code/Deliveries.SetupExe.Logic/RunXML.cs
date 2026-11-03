@@ -179,6 +179,60 @@ namespace Deliveries.SetupExe.Logic
                     }
                     break;
 
+                case "checkexistingsoftware":
+                    {
+                        string type = node.Attributes.GetNamedItem("uninstalltype").Value.ToString();
+                        string value = node.Attributes.GetNamedItem("value").Value.ToString();
+                        bool lbfound = false;
+                        
+                        if(myFunctions.CheckExistingSoftware(type, value)!="")
+                        {
+                            lbfound=true;
+                        }
+
+                        foreach (XmlNode checkexistingsoftwareChildnode in node.ChildNodes)
+                        {
+                            switch (checkexistingsoftwareChildnode.Name)
+                            {
+                                case "exists":
+                                    {
+                                        if (lbfound)
+                                        {
+                                            foreach (XmlNode msiexistsnode in checkexistingsoftwareChildnode.ChildNodes)
+                                            {
+                                                abort = ExecuteTask(msiexistsnode);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            GlobalClass.logger.Info("::" + node.Name + " --> '" + type + " " + value + "' NOT existing.", GlobalClass.SECTION);
+
+                                        }
+                                    }
+                                    break;
+                                case "notexists":
+                                    {
+                                        if (!lbfound)
+                                        {
+                                            foreach (XmlNode msiexistsnode in checkexistingsoftwareChildnode.ChildNodes)
+                                            {
+                                                abort = ExecuteTask(msiexistsnode);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            GlobalClass.logger.Info("::" + node.Name + "--> '" + node.Attributes.GetNamedItem("package").Value.ToString() + "' existing.", GlobalClass.SECTION);
+
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+
+
+
                 case "checkfolder":
                     string folderpath = node.Attributes.GetNamedItem("path").Value.ToString();
                     string contentrequired = node.Attributes.GetNamedItem("contentrequired").Value.ToString().ToUpper();
@@ -667,6 +721,18 @@ namespace Deliveries.SetupExe.Logic
                     myFunctions.KillProcess(node.Attributes.GetNamedItem("name").Value.ToString());
                     break;
 
+                case "blockexefile":
+                case "blockexefolder":
+                case "unblockexefile":
+                case "unblockexefolder":
+                    string blockPath = node.Attributes.GetNamedItem("path").Value;
+                    SetLabel(node.Name, "Change executable block", blockPath);
+                    if (node.Name == "blockexefile") myFunctions.BlockExeFile(blockPath, GlobalClass.VarTable, GlobalClass.ParameterTable);
+                    else if (node.Name == "blockexefolder") myFunctions.BlockExeFolder(blockPath, node.Attributes["type"] == null ? "all" : node.Attributes["type"].Value, GlobalClass.VarTable, GlobalClass.ParameterTable);
+                    else if (node.Name == "unblockexefile") myFunctions.UnblockExeFile(blockPath, GlobalClass.VarTable, GlobalClass.ParameterTable);
+                    else myFunctions.UnblockExeFolder(blockPath, GlobalClass.VarTable, GlobalClass.ParameterTable);
+                    break;
+
                 case "killprocessbypath":
                     SetLabel(node.Name, "Kill running processes by path", "'" + node.Attributes.GetNamedItem("path").Value.ToString() + "'");
                     myFunctions.KillProcessByPath(node.Attributes.GetNamedItem("path").Value.ToString(), GlobalClass.VarTable, GlobalClass.ParameterTable);
@@ -978,7 +1044,7 @@ namespace Deliveries.SetupExe.Logic
                         }
                     }
                     parameters = parameters.Trim();
-                    SetLabel(node.Name, "Executing '" + cmdline + "'", "parameters: '" + parameterssecure + "' / wait: '" + wait + "'");
+                    SetLabel(node.Name, "Executing '" + cmdline + "'", "parameters: '" + parameters + "' / wait: '" + wait + "'");
                     cmdreturnvalue = myFunctions.ExecuteCMD(cmdline, parameters, ref errormsg, wait, windowstyle, GlobalClass.VarTable, GlobalClass.ParameterTable);
 
                     //1618 in case of "msiexec" --> wait a few seconds and try again
@@ -1318,14 +1384,25 @@ namespace Deliveries.SetupExe.Logic
                                 if (loVarRow["name"].ToString().ToLower() == var.ToLower())
                                 {
 
-                                    if (value.StartsWith("[") && value.EndsWith("]"))
+                                    try
                                     {
-                                        loVarRow["value"] = StringDecode(value.Substring(1, value.Length-2), GlobalClass.ProductCode);
+                                        if (value.StartsWith("[") && value.EndsWith("]"))
+                                        {
+                                            if (value.Substring(1,2) == "==")
+                                            {
+                                                loVarRow["value"] = StringDecode(value.Substring(3, value.Length-4), "\x79\x75\x4B\x6F\x6E");
+                                            }
+                                            else
+                                            {
+                                                loVarRow["value"] = StringDecode(value.Substring(1, value.Length-2), GlobalClass.ProductCode);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            loVarRow["value"] = value;
+                                        }
                                     }
-                                    else
-                                    {
-                                        loVarRow["value"] = value;
-                                    }
+                                    catch { }
                                     lbDoneSomething = true;
 
                                     GlobalClass.logger.Info("::" + node.Name + " --> setvariable: updating '" + loVarRow["name"].ToString().ToLower() + "' to '" + value + @"'.", GlobalClass.SECTION);
@@ -1339,7 +1416,14 @@ namespace Deliveries.SetupExe.Logic
                                 loNewRow["name"] = var;
                                 if (value.StartsWith("[") && value.EndsWith("]"))
                                 {
-                                    loNewRow["value"] = StringDecode(value.Substring(1, value.Length-2), GlobalClass.ProductCode);
+                                    if (value.Substring(1, 2) == "==")
+                                    {
+                                        loNewRow["value"] = StringDecode(value.Substring(3, value.Length-4), "\x79\x75\x4B\x6F\x6E");
+                                    }
+                                    else
+                                    {
+                                        loNewRow["value"] = StringDecode(value.Substring(1, value.Length-2), GlobalClass.ProductCode);
+                                    }
                                 }
                                 else
                                 {
@@ -1736,10 +1820,22 @@ namespace Deliveries.SetupExe.Logic
                         string destination1 = destination;
                         myFunctions.ReplaceEnvVariables(ref source1, GlobalClass.VarTable, GlobalClass.ParameterTable);
                         myFunctions.ReplaceEnvVariables(ref destination1, GlobalClass.VarTable, GlobalClass.ParameterTable);
-                        bool isSourceFileExisting = false;
-                        if (System.IO.File.Exists(source1))
+                        bool isSourceFileExisting = false;                        
+                        if (myFunctions.CheckFile(source1, GlobalClass.VarTable, GlobalClass.ParameterTable))
                         {
                             isSourceFileExisting = true;
+                        }
+                        if(!isSourceFileExisting)
+                        {
+                            if(!source1.Contains(@"\"))
+                            {
+                                source1 = System.IO.Path.GetDirectoryName(GlobalClass.ApplicationPath) + @"\" + source1;
+                            }
+                            GlobalClass.logger.Warn("looking for " + source1, GlobalClass.SECTION);
+                            if(System.IO.File.Exists(source1))
+                            {
+                                isSourceFileExisting=true;
+                            }                           
                         }
                         //else
                         //{
@@ -1854,7 +1950,7 @@ namespace Deliveries.SetupExe.Logic
                         }
                         catch { }
 
-                        if (myFunctions.RemoveShortcuts(path, filename, mode, GlobalClass.StartMenuFilesBefore, GlobalClass.DesktopFilesBefore))
+                        if (myFunctions.RemoveShortcuts(path, filename, mode, GlobalClass.StartMenuFilesBefore, GlobalClass.DesktopFilesBefore, GlobalClass.UserStartMenuFilesBefore, GlobalClass.UserDesktopFilesBefore))
                         {
                             GlobalClass.logger.Info("::" + node.Name + " --> RemoveShortcuts created successfully", GlobalClass.SECTION);
                         }
